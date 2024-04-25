@@ -3,11 +3,13 @@ FROM maven:3.9.6 AS development
 WORKDIR /usr/local/src/mtsa
 
 RUN apt-get update -y \
-    && apt-get install wget
+    && apt-get install wget -y
 
 COPY . .
 
-RUN tar xzvf ./dependencies.tar.gz \
+ARG DEPENDENCIES_VERSION=v0.0.0-dependencies
+RUN wget https://github.com/ITK13201/mtsa/releases/download/PCS_Problem-splittingControllerSynthesis_${DEPENDENCIES_VERSION}/dependencies.tar.gz \
+    && tar xzvf ./dependencies.tar.gz \
     && cp -rv ./dependencies/* ./lib \
     && rm -rf ./dependencies \
     && rm -f ./dependencies.tar.gz
