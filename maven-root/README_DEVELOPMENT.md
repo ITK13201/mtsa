@@ -23,7 +23,7 @@ docker compose up --no-start
 ### 4. Copy built files from container to host
 
 ```shell
-docker compose cp mtsa:/usr/local/src/mtsa/target:./target
+docker compose cp mtsa:/usr/local/src/mtsa/target ./target
 ```
 
 ### 5. Run MTSA
