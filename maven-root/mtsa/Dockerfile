@@ -16,4 +16,5 @@ RUN wget https://github.com/ITK13201/mtsa/releases/download/PCS_Problem-splittin
 
 RUN mvn clean
 
-RUN mvn install -DskipTests=true
+# Build with cached dependencies
+RUN --mount=type=cache,target=/root/.m2 mvn install -DskipTests=true
