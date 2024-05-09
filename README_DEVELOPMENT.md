@@ -1,6 +1,6 @@
 # For Developer
 
-## Usage
+## Build with Docker
 
 ### 1. Move to source dir
 
@@ -26,14 +26,24 @@ docker compose up --no-start
 docker compose cp mtsa:/usr/local/src/mtsa/target ./target
 ```
 
-### 5. Run MTSA
+### Operate with Make
+
+current dir: `maven-root/mtsa`
+
+### Build
 
 ```shell
-java -jar [-Xmx${MEMORY_SIZE}] ./target/mtsa-1.0-SNAPSHOT.jar
+make build
 ```
 
-e.g.)
+### Run
 
 ```shell
-java -jar -Xmx20G ./target/mtsa-1.0-SNAPSHOT.jar
+make run
+```
+
+### Debug with Intellij (Remote JVM Debug)
+
+```shell
+make debug
 ```
