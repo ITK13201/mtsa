@@ -18,7 +18,7 @@ maven-root/mtsa/dependency-reduced-pom.xml
 ### Eclipse ###
 
 .metadata
-bin/
+#bin/
 tmp/
 *.tmp
 *.bak
