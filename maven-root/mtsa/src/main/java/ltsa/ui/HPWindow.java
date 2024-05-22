@@ -3549,7 +3549,37 @@ public class HPWindow extends JFrame implements Runnable {
     // ------------------------------------------------------------------------
 
     public static void main(String[] args) {
+        org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
+        options.addOption("m", true, "Run mode (gui, cui), default: gui");
+        options.addOption("f", true, "Input File (*.lts)");
 
+        org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
+        org.apache.commons.cli.CommandLine commandLine;
+        try {
+            commandLine = parser.parse(options, args);
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.err.println("引数解析エラー");
+            return;
+        }
+
+        boolean isGUI = true;
+        String inputFilePath = "";
+        if (commandLine.hasOption("m")) {
+            String mode = commandLine.getOptionValue("m");
+            if (mode.equals("cui")) {
+                isGUI = false;
+                inputFilePath = commandLine.getOptionValue("f");
+            }
+        }
+
+        if (! isGUI) {
+            // CUI
+            CUIManager manager = new CUIManager(inputFilePath);
+            manager.run();
+            return;
+        }
+
+        // GUI
         String lf = UIManager.getSystemLookAndFeelClassName();
         try {
             UIManager.setLookAndFeel(lf);

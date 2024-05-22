@@ -13,3 +13,7 @@ debug:
 	java $(REMOTE_JVM_FLAG) $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET)
 run:
 	java $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET)
+debug-cui:
+	java $(REMOTE_JVM_FLAG) $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) -m cui -f "/home/itk/work/lab/personal/program/mtsa/testdata/AT（2, 2）.lts"
+run-cui:
+	java $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) -m cui -f "/home/itk/work/lab/personal/program/mtsa/testdata/AT（2, 2）.lts"
