@@ -3549,44 +3549,38 @@ public class HPWindow extends JFrame implements Runnable {
     // ------------------------------------------------------------------------
 
     public static void main(String[] args) {
-        org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
-        options.addOption("m", true, "Run mode (gui, cui), default: gui");
-        options.addOption("f", true, "Input File (*.lts)");
-        options.addOption("c", true, "Target Controller Name (e.g., DirectedController)");
-        options.addOption("s", true, "Sleep Time (ms) to wait for connecting to JVM Debug Tool");
+        // CUI
+        String[] ALLOWED_COMMANDS = {"compile", "compose"};
+        if (args.length > 0 && Arrays.asList(ALLOWED_COMMANDS).contains(args[0])) {
+            String command = args[0];
 
-        org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
-        org.apache.commons.cli.CommandLine commandLine;
-        try {
-            commandLine = parser.parse(options, args);
-        } catch (org.apache.commons.cli.ParseException e) {
-            System.err.println("引数解析エラー");
-            return;
-        }
+            org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
+            options.addOption("f", true, "Input File (*.lts)");
+            options.addOption("c", true, "Target Controller Name (e.g., DirectedController)");
+            options.addOption("s", true, "Sleep Time (ms) to wait for connecting to JVM Debug Tool");
 
-        boolean isGUI = true;
-        String inputFilePath = null;
-        String targetControllerName = null;
-        Integer sleepTime = null;
-        if (commandLine.hasOption("m")) {
-            String mode = commandLine.getOptionValue("m");
-            if (mode.equals("cui")) {
-                isGUI = false;
-                inputFilePath = commandLine.getOptionValue("f");
-                targetControllerName = commandLine.getOptionValue("c");
-                String s = commandLine.getOptionValue("s");
-                if (s != null) {
-                    sleepTime = Integer.valueOf(s);
-                }
+            org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
+            org.apache.commons.cli.CommandLine commandLine;
+            try {
+                commandLine = parser.parse(options, args);
+            } catch (org.apache.commons.cli.ParseException e) {
+                System.err.println("引数解析エラー");
+                return;
             }
-        }
 
-        if (! isGUI) {
-            // CUI
-            CUIManager manager = new CUIManager(inputFilePath, targetControllerName, sleepTime);
+            String inputFilePath = commandLine.getOptionValue("f");
+            String targetControllerName = commandLine.getOptionValue("c");
+            String s = commandLine.getOptionValue("s");
+            Integer sleepTime = null;
+            if (s != null) {
+                sleepTime = Integer.valueOf(s);
+            }
+
+            CUIManager manager = new CUIManager(command, inputFilePath, targetControllerName, sleepTime);
             manager.run();
             return;
         }
+
 
         // GUI
         String lf = UIManager.getSystemLookAndFeelClassName();

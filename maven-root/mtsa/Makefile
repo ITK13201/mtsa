@@ -13,7 +13,7 @@ debug:
 	java $(REMOTE_JVM_FLAG) $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET)
 run:
 	java $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET)
-debug-cui:
-	java $(REMOTE_JVM_FLAG) $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) -m cui -f "../../testdata/AT（2, 2）.lts" -c TraditionalController -s 5000
-run-cui:
-	java $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) -m cui -f "../../testdata/AT（2, 2）.lts" -c TraditionalController
+debug-compile:
+	java $(REMOTE_JVM_FLAG) $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) compile -f "../../testdata/AT（2, 2）.lts" -c TraditionalController -s 5000
+run-compile:
+	java $(MEMORY_FLAG) $(JAR_FLAG) $(TARGET) compile -f "../../testdata/AT（2, 2）.lts" -c TraditionalController
