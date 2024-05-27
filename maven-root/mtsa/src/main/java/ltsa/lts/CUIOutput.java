@@ -1,10 +1,11 @@
 package ltsa.lts;
 
 
-public class ConsoleOutput implements LTSOutput {
+public class CUIOutput implements LTSOutput {
     private StringBuffer output = new StringBuffer();
 
-    public void clearOutput() {}
+    public void clearOutput() {
+    }
 
     public void out(String str) {
         output.append(str);

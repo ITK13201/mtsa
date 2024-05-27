@@ -3552,6 +3552,8 @@ public class HPWindow extends JFrame implements Runnable {
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("m", true, "Run mode (gui, cui), default: gui");
         options.addOption("f", true, "Input File (*.lts)");
+        options.addOption("c", true, "Target Controller Name (e.g., DirectedController)");
+        options.addOption("s", true, "Sleep Time (ms) to wait for connecting to JVM Debug Tool");
 
         org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
         org.apache.commons.cli.CommandLine commandLine;
@@ -3563,18 +3565,25 @@ public class HPWindow extends JFrame implements Runnable {
         }
 
         boolean isGUI = true;
-        String inputFilePath = "";
+        String inputFilePath = null;
+        String targetControllerName = null;
+        Integer sleepTime = null;
         if (commandLine.hasOption("m")) {
             String mode = commandLine.getOptionValue("m");
             if (mode.equals("cui")) {
                 isGUI = false;
                 inputFilePath = commandLine.getOptionValue("f");
+                targetControllerName = commandLine.getOptionValue("c");
+                String s = commandLine.getOptionValue("s");
+                if (s != null) {
+                    sleepTime = Integer.valueOf(s);
+                }
             }
         }
 
         if (! isGUI) {
             // CUI
-            CUIManager manager = new CUIManager(inputFilePath);
+            CUIManager manager = new CUIManager(inputFilePath, targetControllerName, sleepTime);
             manager.run();
             return;
         }
