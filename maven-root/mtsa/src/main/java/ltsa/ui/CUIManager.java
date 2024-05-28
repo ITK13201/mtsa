@@ -130,8 +130,12 @@ class CUIManager {
         CUIOutput ltsOutput = new CUIOutput();
         String currentDirectory = ".";
 
+        LTSResultManager.start();
         doCompile(ltsInput, ltsOutput, currentDirectory, targetControllerName);
+        LTSResultManager.finish();
+
         System.out.println(ltsOutput.toString());
+        LTSResultManager.dump();
     }
 
     private void runCompose(String input, String targetControllerName) {
@@ -152,6 +156,8 @@ class CUIManager {
                 e.printStackTrace();
             }
         }
+
+        LTSResultManager.init(this.command, this.inputFilePath, this.targetControllerName);
 
         String input = readFile(this.inputFilePath);
         switch (this.command) {
