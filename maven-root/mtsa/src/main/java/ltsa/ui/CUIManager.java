@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 class CUIManager {
     String command;
     String inputFilePath;
-    String targetControllerName;
+    String targetName;
     Integer sleepTime;
 
-    public CUIManager(String command, String inputFilePath, String targetControllerName, Integer sleepTime) {
+    public CUIManager(String command, String inputFilePath, String targetName, Integer sleepTime) {
         this.command = command;
         this.inputFilePath = inputFilePath;
-        this.targetControllerName = targetControllerName;
+        this.targetName = targetName;
         this.sleepTime = sleepTime;
     }
 
@@ -67,7 +67,7 @@ class CUIManager {
             LTSInputString ltsInputString,
             LTSOutput ltsOutput,
             String currentDirectory,
-            String targetControllerName
+            String targetName
     ) {
         long maxMemoryUsage = 0;
         long maxStates = 0;
@@ -75,7 +75,7 @@ class CUIManager {
 
         long startTime = System.currentTimeMillis();
 
-        CompositeState cs = this.doCompile(ltsInputString, ltsOutput, currentDirectory, targetControllerName);
+        CompositeState cs = this.doCompile(ltsInputString, ltsOutput, currentDirectory, targetName);
         ltsOutput.outln("Compile is Complete!");
         ltsOutput.outln("");
         ltsOutput.outln("");
@@ -125,26 +125,31 @@ class CUIManager {
 
     // === [END] PARTIAL COPY FROM HPWindow ===
 
-    private void runCompile(String input, String targetControllerName) {
+    private void runCompile(String input, String targetName) {
         LTSInputString ltsInput = new LTSInputString(input);
         CUIOutput ltsOutput = new CUIOutput();
         String currentDirectory = ".";
 
         LTSResultManager.start();
-        doCompile(ltsInput, ltsOutput, currentDirectory, targetControllerName);
+        doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
         LTSResultManager.finish();
 
         System.out.println(ltsOutput.toString());
         LTSResultManager.dump();
     }
 
-    private void runCompose(String input, String targetControllerName) {
+    private void runCompose(String input, String targetName) {
         LTSInputString ltsInput = new LTSInputString(input);
         CUIOutput ltsOutput = new CUIOutput();
         String currentDirectory = ".";
 
-        doComposition(ltsInput, ltsOutput, currentDirectory, targetControllerName);
+        LTSResultManager.start();
+        doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
+        doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
+        LTSResultManager.finish();
+
         System.out.println(ltsOutput.toString());
+        LTSResultManager.dump();
     }
 
     public void run() {
@@ -157,17 +162,17 @@ class CUIManager {
             }
         }
 
-        LTSResultManager.init(this.command, this.inputFilePath, this.targetControllerName);
+        LTSResultManager.init("CUI", this.command, this.inputFilePath, this.targetName);
 
         String input = readFile(this.inputFilePath);
         switch (this.command) {
             case "compile":
                 System.out.println("Run Compile");
-                this.runCompile(input, this.targetControllerName);
+                this.runCompile(input, this.targetName);
                 break;
             case "compose":
                 System.out.println("Run Compose");
-                this.runCompose(input, this.targetControllerName);
+                this.runCompose(input, this.targetName);
                 break;
             default:
                 System.out.println("Unknown command: " + this.command);

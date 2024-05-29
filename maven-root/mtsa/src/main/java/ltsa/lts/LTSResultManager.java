@@ -16,8 +16,8 @@ public class LTSResultManager {
     public static final ZoneId JST = ZoneId.of("Asia/Tokyo");
     public static final String BASE_RESULT_DATA_DIR = "../../resultdata";
 
-    public static void init(String command, String inputFilePath, String targetController) {
-        data = new LTSResult(command, inputFilePath, targetController);
+    public static void init(String mode, String command, String inputFilePath, String target) {
+        data = new LTSResult(mode, command, inputFilePath, target);
     }
 
     public static void delete() {
@@ -32,13 +32,14 @@ public class LTSResultManager {
     public static void finish() {
         ZonedDateTime now = ZonedDateTime.now(JST);
         data.setFinishedAt(now);
+        data.calculateDuration();
     }
 
     private static String getResultFilePath() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String prefix = formatter.format(data.getStartedAt());
 
-        return String.format("%s/%s_%s_%s_%s.json", BASE_RESULT_DATA_DIR, prefix, data.getLts(), data.getTargetController(), data.getCommand());
+        return String.format("%s/%s_%s_%s_%s.json", BASE_RESULT_DATA_DIR, prefix, data.getLts(), data.getTarget(), data.getCommand());
     }
 
     public static void dump() {

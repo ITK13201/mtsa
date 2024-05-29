@@ -834,6 +834,7 @@ public class HPWindow extends JFrame implements Runnable {
         check_safe.setEnabled(flag);
 
         check_progress.setEnabled(flag);
+        check_progress.setEnabled(flag);
         check_run.setEnabled(flag);
         check_reachable.setEnabled(flag);
         build_parse.setEnabled(flag);
@@ -968,11 +969,21 @@ public class HPWindow extends JFrame implements Runnable {
                     break;
                 case DO_compile:
                     showOutput();
+                    LTSResultManager.delete();
+                    LTSResultManager.init("GUI", "compile", this.openFile, (String) this.targetChoice.getSelectedItem());
+                    LTSResultManager.start();
                     compile();
+                    LTSResultManager.finish();
+                    LTSResultManager.dump();
                     break;
                 case DO_doComposition:
                     showOutput();
+                    LTSResultManager.delete();
+                    LTSResultManager.init("GUI", "compose", this.openFile, (String) this.targetChoice.getSelectedItem());
+                    LTSResultManager.start();
                     doComposition();
+                    LTSResultManager.finish();
+                    LTSResultManager.dump();
                     break;
                 case DO_minimiseComposition:
                     showOutput();
@@ -3556,7 +3567,7 @@ public class HPWindow extends JFrame implements Runnable {
 
             org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
             options.addOption("f", true, "Input File (*.lts)");
-            options.addOption("c", true, "Target Controller Name (e.g., DirectedController)");
+            options.addOption("t", true, "Target Name (e.g., DirectedController)");
             options.addOption("s", true, "Sleep Time (ms) to wait for connecting to JVM Debug Tool");
 
             org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
@@ -3569,14 +3580,14 @@ public class HPWindow extends JFrame implements Runnable {
             }
 
             String inputFilePath = commandLine.getOptionValue("f");
-            String targetControllerName = commandLine.getOptionValue("c");
+            String targetName = commandLine.getOptionValue("t");
             String s = commandLine.getOptionValue("s");
             Integer sleepTime = null;
             if (s != null) {
                 sleepTime = Integer.valueOf(s);
             }
 
-            CUIManager manager = new CUIManager(command, inputFilePath, targetControllerName, sleepTime);
+            CUIManager manager = new CUIManager(command, inputFilePath, targetName, sleepTime);
             manager.run();
             return;
         }
