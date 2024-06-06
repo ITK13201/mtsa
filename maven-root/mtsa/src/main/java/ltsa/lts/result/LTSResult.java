@@ -1,30 +1,15 @@
-package ltsa.lts;
+package ltsa.lts.result;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
 import java.io.File;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
-class ZonedDateTimeSerializer implements JsonSerializer<ZonedDateTime> {
-    @Override
-    public JsonElement serialize(ZonedDateTime src, Type typeOfSrc, JsonSerializationContext context) {
-        return context.serialize(src.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-    }
-}
-
-// Duration is output in millisecond [ms]
-class DurationSerializer implements JsonSerializer<Duration> {
-    @Override
-    public JsonElement serialize(Duration src, Type typeOfSrc, JsonSerializationContext context) {
-        return context.serialize(src.toMillis());
-    }
-}
 
 @Data
 public class LTSResult {
@@ -37,6 +22,8 @@ public class LTSResult {
     private String lts;
 
     // additional parameters
+    private LTSResultCompileStep compileStep;
+
     private ZonedDateTime startedAt;
     private ZonedDateTime finishedAt;
     @SerializedName("duration [ms]")
@@ -48,6 +35,7 @@ public class LTSResult {
         this.ltsFilePath = ltsFilePath;
         this.target = target;
         this.lts = this.getLTSNameFromInputFilePath(ltsFilePath);
+        this.compileStep = new LTSResultCompileStep();
     }
 
     private String getLTSNameFromInputFilePath(String ltsFilePath) {

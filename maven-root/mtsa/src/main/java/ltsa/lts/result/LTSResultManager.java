@@ -1,4 +1,4 @@
-package ltsa.lts;
+package ltsa.lts.result;
 
 
 import java.io.BufferedWriter;

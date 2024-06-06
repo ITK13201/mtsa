@@ -1,5 +1,9 @@
 package ltsa.lts;
 
+import ltsa.lts.result.LTSResultCompileStepRequirement;
+import ltsa.lts.result.LTSResultManager;
+
+import java.time.Duration;
 import java.util.BitSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -134,6 +138,13 @@ public class Minimiser {
         long finish =System.currentTimeMillis();
         output.outln("");
         output.outln("Minimised States: "+c.maxStates+" in "+(finish-start)+"ms");
+
+        LTSResultCompileStepRequirement requirementResult = LTSResultManager.data.
+                getCompileStep().
+                requirements.
+                get(LTSResultManager.data.getCompileStep().requirements.size() - 1);
+        requirementResult.setMinimizeDuration(Duration.ofMillis(finish - start));
+
         return  c;
     }
 

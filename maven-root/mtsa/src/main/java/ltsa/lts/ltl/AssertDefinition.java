@@ -14,14 +14,10 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 
-import ltsa.lts.CompactState;
-import ltsa.lts.CompositeState;
-import ltsa.lts.Diagnostics;
-import ltsa.lts.LTSOutput;
-import ltsa.lts.LabelSet;
-import ltsa.lts.Minimiser;
-import ltsa.lts.Symbol;
+import ltsa.lts.*;
 import ltsa.dispatcher.TransitionSystemDispatcher;
+import ltsa.lts.result.LTSResultCompileStepRequirement;
+import ltsa.lts.result.LTSResultManager;
 
 /* -----------------------------------------------------------------------*/
 
@@ -195,6 +191,13 @@ public class AssertDefinition {
         //gba.printNodes(output);
         Graph g = gba.Gmake();
 		output.outln("GBA " + g.getNodeCount() + " states " + g.getEdgeCount() + " transitions");
+
+		// add to result
+		LTSResultCompileStepRequirement requirementResult = new LTSResultCompileStepRequirement(p.name.toString());
+		requirementResult.setNumberOfStates(g.getNodeCount());
+		requirementResult.setNumberOfTransitions(g.getEdgeCount());
+		LTSResultManager.data.getCompileStep().requirements.add(requirementResult);
+
         g = SuperSetReduction.reduce(g);
 		//output.outln("SSR " + g.getNodeCount() + " states " + g.getEdgeCount() + " transitions");
         Graph g1 = Degeneralize.degeneralize(g);

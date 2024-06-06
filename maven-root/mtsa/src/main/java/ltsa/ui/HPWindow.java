@@ -28,6 +28,7 @@ import ltsa.jung.LTSJUNGCanvas.EnumLayout;
 import ltsa.lts.*;
 import ltsa.lts.ltl.AssertDefinition;
 import ltsa.lts.ltl.FormulaFactory;
+import ltsa.lts.result.LTSResultManager;
 import ltsa.lts.util.MTSUtils;
 import ltsa.ui.enactment.EnactorOptionsWindows;
 import ltsa.ui.update.UpdateGraphSimulation;

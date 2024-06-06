@@ -2,6 +2,7 @@ package ltsa.ui;
 
 import ltsa.dispatcher.TransitionSystemDispatcher;
 import ltsa.lts.*;
+import ltsa.lts.result.LTSResultManager;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

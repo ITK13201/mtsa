@@ -1,9 +1,12 @@
 package ltsa.lts;
 
 import ltsa.lts.ltl.FluentTrace;
+import ltsa.lts.result.LTSResultCompileStepEnvironment;
+import ltsa.lts.result.LTSResultManager;
 import ltsa.lts.util.LTSUtils;
 import ltsa.ui.HPWindow;
 
+import java.time.Duration;
 import java.util.*;
 
 public class Analyser implements Animator, Automata {
@@ -112,12 +115,14 @@ public class Analyser implements Animator, Automata {
         }
         // print and compute state space size
         Mbase = new int[Nmach];
+        int numberOfMaxStates = 1;
         output.out("State Space:");
         for (int i = 0; i < sm.length; i++) {
             output.out(" " + sm[i].maxStates + " ");
             if (i < sm.length - 1)
                 output.out("*");
             Mbase[i] = sm[i].maxStates;
+            numberOfMaxStates *= sm[i].maxStates;
         }
         coder = new StateCodec(Mbase);
         output.outln("= 2 ** " + coder.bits());
@@ -234,6 +239,10 @@ public class Analyser implements Animator, Automata {
             }
         }
 
+        // add to result
+        LTSResultCompileStepEnvironment environmentResult = new LTSResultCompileStepEnvironment(this.cs.name);
+        environmentResult.setNumberOfMaxStates(numberOfMaxStates);
+        LTSResultManager.data.getCompileStep().environments.add(environmentResult);
     }
 
     private MyList compTrans; // list of transitions
@@ -265,9 +274,20 @@ public class Analyser implements Animator, Automata {
         long finish = System.currentTimeMillis();
         outStatistics(explorerContext.stateCount, compTrans.size());
         output.outln("Composed in " + (finish - start) + "ms");
+
+        // add to result
+        LTSResultCompileStepEnvironment environmentResult = LTSResultManager.data.
+                getCompileStep().
+                environments.
+                get(LTSResultManager.data.getCompileStep().environments.size() - 1);
+        environmentResult.setNumberOfStates(explorerContext.stateCount);
+        environmentResult.setNumberOfTransitions(compTrans.size());
+        environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
+
         compositionEngine.teardown();
         compTrans = null;
         explorerContext.compTrans = null;
+
         return c;
     }
 
