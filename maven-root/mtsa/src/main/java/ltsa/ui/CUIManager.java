@@ -3,6 +3,7 @@ package ltsa.ui;
 import ltsa.dispatcher.TransitionSystemDispatcher;
 import ltsa.lts.*;
 import ltsa.lts.result.LTSResultManager;
+import ltsa.lts.result.LTSResultStep;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -76,6 +77,8 @@ class CUIManager {
 
         long startTime = System.currentTimeMillis();
 
+        LTSResultManager.currentStep = LTSResultStep.COMPILE;
+
         CompositeState cs = this.doCompile(ltsInputString, ltsOutput, currentDirectory, targetName);
         ltsOutput.outln("Compile is Complete!");
         ltsOutput.outln("");
@@ -84,6 +87,9 @@ class CUIManager {
         ltsOutput.outln("===================================================");
         ltsOutput.outln("                    Composition                    ");
         ltsOutput.outln("===================================================");
+
+        LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+
         TransitionSystemDispatcher.applyComposition(cs, ltsOutput);
 
         long endTime = System.currentTimeMillis();
@@ -135,7 +141,6 @@ class CUIManager {
         doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
         LTSResultManager.finish();
 
-        System.out.println(ltsOutput.toString());
         LTSResultManager.dump();
     }
 
@@ -145,11 +150,9 @@ class CUIManager {
         String currentDirectory = ".";
 
         LTSResultManager.start();
-        doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
         doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
         LTSResultManager.finish();
 
-        System.out.println(ltsOutput.toString());
         LTSResultManager.dump();
     }
 
