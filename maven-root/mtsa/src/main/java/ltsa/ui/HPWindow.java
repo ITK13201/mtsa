@@ -29,6 +29,7 @@ import ltsa.lts.*;
 import ltsa.lts.ltl.AssertDefinition;
 import ltsa.lts.ltl.FormulaFactory;
 import ltsa.lts.result.LTSResultManager;
+import ltsa.lts.result.LTSResultStep;
 import ltsa.lts.util.MTSUtils;
 import ltsa.ui.enactment.EnactorOptionsWindows;
 import ltsa.ui.update.UpdateGraphSimulation;
@@ -2161,6 +2162,7 @@ public class HPWindow extends JFrame implements Runnable {
         ltsOutput.clearOutput();
         long startTime = System.currentTimeMillis();
 
+            LTSResultManager.currentStep = LTSResultStep.COMPILE;
             compile();
             ltsOutput.outln("Compile is Complete!");
             ltsOutput.outln("");
@@ -2169,6 +2171,8 @@ public class HPWindow extends JFrame implements Runnable {
             ltsOutput.outln("===================================================");
             ltsOutput.outln("                    Composition                    ");
             ltsOutput.outln("===================================================");
+
+            LTSResultManager.currentStep = LTSResultStep.COMPOSE;
             TransitionSystemDispatcher.applyComposition(current, ltsOutput);
             postState(current);
 

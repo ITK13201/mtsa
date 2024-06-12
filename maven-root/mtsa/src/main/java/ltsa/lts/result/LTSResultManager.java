@@ -16,6 +16,8 @@ public class LTSResultManager {
     public static final ZoneId JST = ZoneId.of("Asia/Tokyo");
     public static final String BASE_RESULT_DATA_DIR = "../../resultdata";
 
+    public static LTSResultStep currentStep = LTSResultStep.INIT;
+
     public static void init(String mode, String command, String inputFilePath, String target) {
         data = new LTSResult(mode, command, inputFilePath, target);
     }

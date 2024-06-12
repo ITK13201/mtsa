@@ -45,6 +45,9 @@ import ltsa.lts.*;
 import ltsa.lts.Minimiser;
 import ltsa.lts.distribution.DistributionDefinition;
 import ltsa.lts.distribution.DistributionTransformationException;
+import ltsa.lts.result.LTSResultComposeStepSolvingProblem;
+import ltsa.lts.result.LTSResultManager;
+import ltsa.lts.result.LTSResultStep;
 import ltsa.lts.util.MTSUtils;
 import ltsa.ui.MTSAnimator;
 import ltsa.updatingControllers.structures.UpdatingControllerCompositeState;
@@ -55,6 +58,7 @@ import org.apache.commons.collections15.ListUtils;
 import org.apache.commons.lang.Validate;
 import org.junit.Assert;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -2030,6 +2034,7 @@ public class TransitionSystemDispatcher {
             // ToMarian: add this (most of it?) code to a new class
             // LTSControlProblem
             output.outln("Solving the LTS control problem.");
+            LTSResultManager.currentStep = LTSResultStep.COMPOSE_SOLVING_PROBLEM;
 
 
             MTS<StrategyState<Long, Integer>, String> synthesised = null;
@@ -2078,7 +2083,14 @@ public class TransitionSystemDispatcher {
                     // MDP
                     // translation
 
-                    output.outln("Analysis time: " + (System.currentTimeMillis() - initialTime) + "ms.");
+                    long endTime = System.currentTimeMillis();
+                    output.outln("Analysis time: " + (endTime - initialTime) + "ms.");
+                    // add to result
+                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                            getComposeStep().
+                            solvingProblem;
+                    solvingProblemResult.setSolvingDuration(Duration.ofMillis(endTime - initialTime));
+
                     output.outln("Controller [" + plainController.getStates().size() + "] generated successfully.");
                     CompactState controller = MTSToAutomataConverter.getInstance().convert(plainController,
                             compositeState.getName(), isMTS);

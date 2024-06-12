@@ -1,8 +1,7 @@
 package ltsa.lts;
 
 import ltsa.lts.ltl.FluentTrace;
-import ltsa.lts.result.LTSResultCompileStepEnvironment;
-import ltsa.lts.result.LTSResultManager;
+import ltsa.lts.result.*;
 import ltsa.lts.util.LTSUtils;
 import ltsa.ui.HPWindow;
 
@@ -240,9 +239,40 @@ public class Analyser implements Animator, Automata {
         }
 
         // add to result
-        LTSResultCompileStepEnvironment environmentResult = new LTSResultCompileStepEnvironment(this.cs.name);
-        environmentResult.setNumberOfMaxStates(numberOfMaxStates);
-        LTSResultManager.data.getCompileStep().environments.add(environmentResult);
+        if (! this.cs.name.equals("DEFAULT")) {
+            switch (LTSResultManager.currentStep) {
+                case INIT:
+                case COMPILE:
+                    LTSResultCompileStepEnvironment environmentResult = new LTSResultCompileStepEnvironment(this.cs.name);
+                    environmentResult.setNumberOfMaxStates(numberOfMaxStates);
+                    for (CompactState compactState : this.sm) {
+                        environmentResult.sourceModels.add(compactState.name);
+                    }
+                    LTSResultManager.data.getCompileStep().environments.add(environmentResult);
+                    break;
+                case COMPOSE:
+                    LTSResultComposeStepComposition compositionResult = LTSResultManager.data.
+                            getComposeStep().
+                            composition;
+                    compositionResult.setNumberOfMaxStates(numberOfMaxStates);
+                    for (CompactState compactState : this.sm) {
+                        compositionResult.sourceModels.add(compactState.name);
+                    }
+                    LTSResultManager.data.getComposeStep().composition = compositionResult;
+                    break;
+                case COMPOSE_SOLVING_PROBLEM:
+                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                            getComposeStep().
+                            solvingProblem;
+                    solvingProblemResult.setNumberOfMaxStates(numberOfMaxStates);
+                    for (CompactState compactState : this.sm) {
+                        solvingProblemResult.sourceModels.add(compactState.name);
+                    }
+                    LTSResultManager.data.getComposeStep().solvingProblem = solvingProblemResult;
+                    break;
+            }
+        }
+
     }
 
     private MyList compTrans; // list of transitions
@@ -276,13 +306,36 @@ public class Analyser implements Animator, Automata {
         output.outln("Composed in " + (finish - start) + "ms");
 
         // add to result
-        LTSResultCompileStepEnvironment environmentResult = LTSResultManager.data.
-                getCompileStep().
-                environments.
-                get(LTSResultManager.data.getCompileStep().environments.size() - 1);
-        environmentResult.setNumberOfStates(explorerContext.stateCount);
-        environmentResult.setNumberOfTransitions(compTrans.size());
-        environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
+        if (! this.cs.name.equals("DEFAULT")) {
+            switch (LTSResultManager.currentStep) {
+                case INIT:
+                case COMPILE:
+                    LTSResultCompileStepEnvironment environmentResult = LTSResultManager.data.
+                            getCompileStep().
+                            environments.
+                            get(LTSResultManager.data.getCompileStep().environments.size() - 1);
+                    environmentResult.setNumberOfStates(explorerContext.stateCount);
+                    environmentResult.setNumberOfTransitions(compTrans.size());
+                    environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
+                    break;
+                case COMPOSE:
+                    LTSResultComposeStepComposition compositionResult = LTSResultManager.data.
+                            getComposeStep().
+                            composition;
+                    compositionResult.setNumberOfStates(explorerContext.stateCount);
+                    compositionResult.setNumberOfTransitions(compTrans.size());
+                    compositionResult.setComposeDuration(Duration.ofMillis(finish - start));
+                    break;
+                case COMPOSE_SOLVING_PROBLEM:
+                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                            getComposeStep().
+                            solvingProblem;
+                    solvingProblemResult.setNumberOfStates(explorerContext.stateCount);
+                    solvingProblemResult.setNumberOfTransitions(compTrans.size());
+                    solvingProblemResult.setComposeDuration(Duration.ofMillis(finish - start));
+            }
+        }
+
 
         compositionEngine.teardown();
         compTrans = null;

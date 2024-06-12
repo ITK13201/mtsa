@@ -11,8 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 @Data
-public class LTSResultCompileStepEnvironment {
-    private String name;
+public class LTSResultComposeStepComposition {
     private Integer numberOfMaxStates;
     private Integer numberOfStates;
     private Integer numberOfTransitions;
@@ -20,8 +19,7 @@ public class LTSResultCompileStepEnvironment {
     private Duration composeDuration;
     public ArrayList<String> sourceModels;
 
-    public LTSResultCompileStepEnvironment(String name) {
-        this.name = name;
+    public LTSResultComposeStepComposition() {
         this.sourceModels = new ArrayList<>();
     }
 

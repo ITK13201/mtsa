@@ -23,6 +23,7 @@ public class LTSResult {
 
     // additional parameters
     private LTSResultCompileStep compileStep;
+    private LTSResultComposeStep composeStep;
 
     private ZonedDateTime startedAt;
     private ZonedDateTime finishedAt;
@@ -36,6 +37,7 @@ public class LTSResult {
         this.target = target;
         this.lts = this.getLTSNameFromInputFilePath(ltsFilePath);
         this.compileStep = new LTSResultCompileStep();
+        this.composeStep = new LTSResultComposeStep();
     }
 
     private String getLTSNameFromInputFilePath(String ltsFilePath) {
