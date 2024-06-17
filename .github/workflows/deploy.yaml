@@ -44,6 +44,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    defaults:
+      run:
+        working-directory: maven-root/mtsa
 
     steps:
     - name: Checkout GitHub repository
