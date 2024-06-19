@@ -1,0 +1,80 @@
+name: Deploy JAR
+
+on:
+  push:
+    tags:
+      - 'PCS_MachineLearning_v*'
+
+env:
+  MTSA_DEPENDENCIES_VERSION: 'v0.0.0-dependencies'
+  JAVA_DISTRIBUTION: zulu
+  JAVA_VERSION: '22'
+  JAVA_PACKAGE: jdk
+  JAVA_ARCHITECTURE: x64
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: maven-root/mtsa
+
+    steps:
+    - name: Checkout GitHub repository
+      uses: actions/checkout@v4
+    - name: Fetch Maven Dependencies
+      run: |
+        wget https://github.com/ITK13201/mtsa/releases/download/PCS_Problem-splittingControllerSynthesis_${{ env.MTSA_DEPENDENCIES_VERSION }}/dependencies.tar.gz \
+            && tar xzf ./dependencies.tar.gz \
+            && cp -rv ./dependencies/* ./lib \
+            && rm -rf ./dependencies \
+            && rm -f ./dependencies.tar.gz
+    - name: Setup JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+        java-package: ${{ env.JAVA_PACKAGE }}
+        architecture: ${{ env.JAVA_ARCHITECTURE }}
+
+    - name: Package
+      run: |
+        mvn clean package -DskipTests=true --batch-mode --no-transfer-progress
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    defaults:
+      run:
+        working-directory: maven-root/mtsa
+
+    steps:
+    - name: Checkout GitHub repository
+      uses: actions/checkout@v4
+    - name: Setup JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION }}
+        java-version: ${{ env.JAVA_VERSION }}
+        java-package: ${{ env.JAVA_PACKAGE }}
+        architecture: ${{ env.JAVA_ARCHITECTURE }}
+        server-id: github
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_USER_PASSWORD
+        gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+        gpg-passphrase: MAVEN_GPG_PASSPHRASE
+    - name: Fetch Maven Dependencies
+      run: |
+        wget https://github.com/ITK13201/mtsa/releases/download/PCS_Problem-splittingControllerSynthesis_${{ env.MTSA_DEPENDENCIES_VERSION }}/dependencies.tar.gz \
+            && tar xzf ./dependencies.tar.gz \
+            && cp -rv ./dependencies/* ./lib \
+            && rm -rf ./dependencies \
+            && rm -f ./dependencies.tar.gz
+
+    - name: Deploy
+      run: |
+        mvn clean deploy -DskipTests=true --batch-mode --no-transfer-progress
+      env:
+        MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+        MAVEN_USER_PASSWORD: ${{ secrets.MAVEN_USER_PASSWORD }}
+        MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}

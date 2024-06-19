@@ -1,7 +1,7 @@
 REMOTE_JVM_FLAG	= -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 MEMORY_FLAG		= -Xmx20G
 JAR_FLAG		= -jar
-TARGET			= ./target/mtsa-1.0-SNAPSHOT.jar
+TARGET			= ./target/mtsa.jar
 
 clean:
 	mvn clean

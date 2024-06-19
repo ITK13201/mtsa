@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>mtsa</groupId>
     <artifactId>mtsa</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>PCS_MachineLearning_v0.0.2</version>
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -46,6 +46,7 @@
 
 
     <build>
+        <finalName>mtsa</finalName>
         <testSourceDirectory>src/test/java/</testSourceDirectory>
         <plugins>
 
@@ -508,4 +509,11 @@
         </plugins>
     </reporting>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ITK13201/mtsa</url>
+        </repository>
+    </distributionManagement>
 </project>
