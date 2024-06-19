@@ -192,12 +192,6 @@ public class AssertDefinition {
         Graph g = gba.Gmake();
 		output.outln("GBA " + g.getNodeCount() + " states " + g.getEdgeCount() + " transitions");
 
-		// add to result
-		LTSResultCompileStepRequirement requirementResult = new LTSResultCompileStepRequirement(p.name.toString());
-		requirementResult.setNumberOfStates(g.getNodeCount());
-		requirementResult.setNumberOfTransitions(g.getEdgeCount());
-		LTSResultManager.data.getCompileStep().requirements.add(requirementResult);
-
         g = SuperSetReduction.reduce(g);
 		//output.outln("SSR " + g.getNodeCount() + " states " + g.getEdgeCount() + " transitions");
         Graph g1 = Degeneralize.degeneralize(g);

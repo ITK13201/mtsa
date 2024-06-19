@@ -7,11 +7,8 @@ import MTSTools.ac.ic.doc.commons.collections.PowerSet;
 import MTSTools.ac.ic.doc.commons.relations.BinaryRelation;
 import MTSTools.ac.ic.doc.commons.relations.BinaryRelationUtils;
 import MTSTools.ac.ic.doc.commons.relations.Pair;
-import MTSTools.ac.ic.doc.mtstools.model.LTS;
 import MTSTools.ac.ic.doc.mtstools.model.MTS;
 import MTSTools.ac.ic.doc.mtstools.model.impl.UpdatingEnvironment;
-import MTSTools.ac.ic.doc.mtstools.model.impl.LTSImpl;
-import MTSTools.ac.ic.doc.mtstools.model.impl.MTSAdapter;
 import MTSTools.ac.ic.doc.mtstools.model.impl.MTSImpl;
 import com.google.common.collect.Sets;
 import ltsa.ac.ic.doc.mtstools.util.fsp.AutomataToMTSConverter;
@@ -22,9 +19,7 @@ import ltsa.lts.LTSOutput;
 import ltsa.ui.StandardOutput;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import static MTSTools.ac.ic.doc.mtstools.model.MTS.TransitionType.*;
 
@@ -112,6 +107,7 @@ public class ControllerUtils {
 		output.outln("Environment states: " + mts.getStates().size());
 		MTS<Long, String> result = ControllerUtils.removeTopStates(mts, goal.getFluents());
 		output.outln("Game states: " + result.getStates().size());
+		output.outln("Game transitions: " + getNumberOfTransitions(result));
 		return result;
 	}
 
@@ -345,4 +341,30 @@ public class ControllerUtils {
 		return mts;
 	}
 
+	public static Long getNumberOfTransitions(MTS<Long, String> mts) {
+		Long numberOfTransitions = 0L;
+		Map<Long, BinaryRelation<String, Long>> gameTransitions = mts.getTransitions(REQUIRED);
+		for (Map.Entry<Long, BinaryRelation<String, Long>> entry : gameTransitions.entrySet()) {
+			numberOfTransitions += entry.getValue().size();
+		}
+		return numberOfTransitions;
+	}
+
+	public static Long getNumberOfControllableActions(MTS<Long, String> mts, ControllerGoal<String> goal, LTSOutput output) {
+		MTS<Long, String> env = ControllerUtils.removeTopStates(mts, goal.getFluents());
+		Map<Long, BinaryRelation<String, Long>> transitions = env.getTransitions(REQUIRED);
+		Long numberOfControllableActions = 0L;
+		for (Map.Entry<Long, BinaryRelation<String, Long>> entry : transitions.entrySet()) {
+			for (Pair<String, Long> actionPair : entry.getValue()) {
+				String actionName = actionPair.getFirst();
+				Long destinationStateNumber = actionPair.getSecond();
+
+				Set<String> allControllableActions = goal.getControllableActions();
+				if (allControllableActions.contains(actionName)) {
+					numberOfControllableActions++;
+				}
+			}
+		}
+		return numberOfControllableActions;
+	}
 }

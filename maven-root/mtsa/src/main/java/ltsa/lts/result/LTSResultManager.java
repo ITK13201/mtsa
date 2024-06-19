@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LTSResultManager {
     public static LTSResult data = null;
@@ -17,9 +19,11 @@ public class LTSResultManager {
     public static final String BASE_RESULT_DATA_DIR = "../../resultdata";
 
     public static LTSResultStep currentStep = LTSResultStep.INIT;
+    public static HashSet<String> controllableActions;
 
     public static void init(String mode, String command, String inputFilePath, String target) {
         data = new LTSResult(mode, command, inputFilePath, target);
+        controllableActions = new HashSet<>();
     }
 
     public static void delete() {
@@ -42,6 +46,10 @@ public class LTSResultManager {
         String prefix = formatter.format(data.getStartedAt());
 
         return String.format("%s/%s_%s_%s_%s.json", BASE_RESULT_DATA_DIR, prefix, data.getLts(), data.getTarget(), data.getCommand());
+    }
+
+    public static void setControllableActions(Set<String> controllableActions) {
+        LTSResultManager.controllableActions.addAll(controllableActions);
     }
 
     public static void dump() {

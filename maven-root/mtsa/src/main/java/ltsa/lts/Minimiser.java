@@ -139,11 +139,10 @@ public class Minimiser {
         output.outln("");
         output.outln("Minimised States: "+c.maxStates+" in "+(finish-start)+"ms");
 
-        LTSResultCompileStepRequirement requirementResult = LTSResultManager.data.
-                getCompileStep().
-                requirements.
-                get(LTSResultManager.data.getCompileStep().requirements.size() - 1);
+        // add to result
+        LTSResultCompileStepRequirement requirementResult = new LTSResultCompileStepRequirement(c.name);
         requirementResult.setMinimizeDuration(Duration.ofMillis(finish - start));
+        LTSResultManager.data.getCompileStep().requirements.add(requirementResult);
 
         return  c;
     }

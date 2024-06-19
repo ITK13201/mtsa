@@ -1,11 +1,11 @@
 package ltsa.lts.result;
 
 public class LTSResultComposeStep {
-    public LTSResultComposeStepComposition composition;
+    public LTSResultComposeStepCreatingGameSpace creatingGameSpace;
     public LTSResultComposeStepSolvingProblem solvingProblem;
 
     LTSResultComposeStep() {
-        this.composition = new LTSResultComposeStepComposition();
+        this.creatingGameSpace = new LTSResultComposeStepCreatingGameSpace();
         this.solvingProblem = new LTSResultComposeStepSolvingProblem();
     }
 }

@@ -12,8 +12,6 @@ import java.time.ZonedDateTime;
 @Data
 public class LTSResultCompileStepRequirement {
     private String name;
-    private Integer numberOfStates;
-    private Integer numberOfTransitions;
     @SerializedName("minimizeDuration [ms]")
     private Duration minimizeDuration;
 

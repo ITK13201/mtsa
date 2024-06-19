@@ -1,5 +1,8 @@
 package ltsa.lts;
 
+import MTSTools.ac.ic.doc.mtstools.model.MTS;
+import ltsa.ac.ic.doc.mtstools.util.fsp.AutomataToMTSConverter;
+import ltsa.control.util.ControllerUtils;
 import ltsa.lts.ltl.FluentTrace;
 import ltsa.lts.result.*;
 import ltsa.lts.util.LTSUtils;
@@ -251,14 +254,15 @@ public class Analyser implements Animator, Automata {
                     LTSResultManager.data.getCompileStep().environments.add(environmentResult);
                     break;
                 case COMPOSE:
-                    LTSResultComposeStepComposition compositionResult = LTSResultManager.data.
+                case COMPOSE_CREATING_GAME_SPACE:
+                    LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
                             getComposeStep().
-                            composition;
-                    compositionResult.setNumberOfMaxStates(numberOfMaxStates);
+                            creatingGameSpace;
+                    creatingGameSpaceResult.setNumberOfMaxStates(numberOfMaxStates);
                     for (CompactState compactState : this.sm) {
-                        compositionResult.sourceModels.add(compactState.name);
+                        creatingGameSpaceResult.sourceModels.add(compactState.name);
                     }
-                    LTSResultManager.data.getComposeStep().composition = compositionResult;
+                    LTSResultManager.data.getComposeStep().creatingGameSpace = creatingGameSpaceResult;
                     break;
                 case COMPOSE_SOLVING_PROBLEM:
                     LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
@@ -307,6 +311,12 @@ public class Analyser implements Animator, Automata {
 
         // add to result
         if (! this.cs.name.equals("DEFAULT")) {
+            MTS<Long, String> env = AutomataToMTSConverter.getInstance().convert(c);
+            Long numberOfControllableActions = null;
+            if (this.cs.goal != null) {
+                numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(env, this.cs.goal, output);
+            }
+
             switch (LTSResultManager.currentStep) {
                 case INIT:
                 case COMPILE:
@@ -319,12 +329,21 @@ public class Analyser implements Animator, Automata {
                     environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
                     break;
                 case COMPOSE:
-                    LTSResultComposeStepComposition compositionResult = LTSResultManager.data.
+                case COMPOSE_CREATING_GAME_SPACE:
+                    LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
                             getComposeStep().
-                            composition;
-                    compositionResult.setNumberOfStates(explorerContext.stateCount);
-                    compositionResult.setNumberOfTransitions(compTrans.size());
-                    compositionResult.setComposeDuration(Duration.ofMillis(finish - start));
+                            creatingGameSpace;
+                    // Add 1 to the number of states in order to add the violating state, -1,
+                    // when creating the game space.
+                    creatingGameSpaceResult.setNumberOfStates(explorerContext.stateCount + 1);
+                    creatingGameSpaceResult.setNumberOfTransitions(compTrans.size());
+                    creatingGameSpaceResult.setComposeDuration(Duration.ofMillis(finish - start));
+                    if (numberOfControllableActions != null) {
+                        creatingGameSpaceResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        creatingGameSpaceResult.setNumberOfUncontrollableActions(
+                                compTrans.size() - Math.toIntExact(numberOfControllableActions)
+                        );
+                    }
                     break;
                 case COMPOSE_SOLVING_PROBLEM:
                     LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
@@ -333,6 +352,13 @@ public class Analyser implements Animator, Automata {
                     solvingProblemResult.setNumberOfStates(explorerContext.stateCount);
                     solvingProblemResult.setNumberOfTransitions(compTrans.size());
                     solvingProblemResult.setComposeDuration(Duration.ofMillis(finish - start));
+                    if (numberOfControllableActions != null) {
+                        solvingProblemResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        solvingProblemResult.setNumberOfUncontrollableActions(
+                                compTrans.size() - Math.toIntExact(numberOfControllableActions)
+                        );
+                    }
+                    break;
             }
         }
 

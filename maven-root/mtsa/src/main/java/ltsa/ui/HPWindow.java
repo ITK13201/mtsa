@@ -4,8 +4,11 @@ package ltsa.ui;
 
 import MTSSynthesis.controller.model.ControllerGoal;
 import MTSTools.ac.ic.doc.commons.relations.BinaryRelation;
+import MTSTools.ac.ic.doc.mtstools.model.MTS;
 import MTSTools.ac.ic.doc.mtstools.model.SemanticType;
 import ltsa.MultiCore.ComputerOptions;
+import ltsa.ac.ic.doc.mtstools.util.fsp.AutomataToMTSConverter;
+import ltsa.control.util.ControllerUtils;
 import ltsa.custom.CustomAnimator;
 import ltsa.custom.SceneAnimator;
 import ltsa.dispatcher.TransitionSystemDispatcher;
@@ -28,6 +31,7 @@ import ltsa.jung.LTSJUNGCanvas.EnumLayout;
 import ltsa.lts.*;
 import ltsa.lts.ltl.AssertDefinition;
 import ltsa.lts.ltl.FormulaFactory;
+import ltsa.lts.result.LTSResultCompileStepFinalModel;
 import ltsa.lts.result.LTSResultManager;
 import ltsa.lts.result.LTSResultStep;
 import ltsa.lts.util.MTSUtils;
@@ -1996,6 +2000,21 @@ public class HPWindow extends JFrame implements Runnable {
             }
 
             cs = comp.continueCompilation((String) targetChoice.getSelectedItem());
+
+            LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+            for (CompactState machine: cs.machines) {
+                MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
+                finalModel.setNumberOfStates(mts.getStates().size());
+                int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                finalModel.setNumberOfTransitions(numberOfTransitions);
+                Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                finalModel.setNumberOfUncontrollableActions(
+                        numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                );
+                LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+            }
 
         } catch (LTSCompositionException x) {
             ltsOutput.outln("Construction of " + targetChoice.getSelectedItem() + " aborted.");
