@@ -2236,6 +2236,8 @@ public class HPWindow extends JFrame implements Runnable {
         ltsOutput.outln("[info] Maximum Memory (KB) : " + maxMemoryUsage);
         ltsOutput.outln("[info] Execution Time (ms) : " + executionTime);
         ltsOutput.outln("");
+
+        LTSResultManager.data.setMaxMemoryUsage(maxMemoryUsage);
     }
 
 
@@ -3584,24 +3586,37 @@ public class HPWindow extends JFrame implements Runnable {
     // ------------------------------------------------------------------------
 
     public static void main(String[] args) {
-        // CUI
         String[] ALLOWED_COMMANDS = {"compile", "compose"};
-        if (args.length > 0 && Arrays.asList(ALLOWED_COMMANDS).contains(args[0])) {
-            String command = args[0];
+        boolean isCUI = args.length > 0 && Arrays.asList(ALLOWED_COMMANDS).contains(args[0]);
 
-            org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
+        org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
+        options.addOption("o", true, "Output (Result) Dir Path");
+        if (isCUI) {
             options.addOption("f", true, "Input File (*.lts)");
             options.addOption("t", true, "Target Name (e.g., DirectedController)");
             options.addOption("s", true, "Sleep Time (ms) to wait for connecting to JVM Debug Tool");
+        }
+        org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
+        org.apache.commons.cli.CommandLine commandLine;
+        try {
+            commandLine = parser.parse(options, args);
+        } catch (org.apache.commons.cli.ParseException e) {
+            System.err.println("引数解析エラー");
+            return;
+        }
 
-            org.apache.commons.cli.CommandLineParser parser = new org.apache.commons.cli.DefaultParser();
-            org.apache.commons.cli.CommandLine commandLine;
-            try {
-                commandLine = parser.parse(options, args);
-            } catch (org.apache.commons.cli.ParseException e) {
-                System.err.println("引数解析エラー");
-                return;
-            }
+        String outputDir = commandLine.getOptionValue("o");
+        if (outputDir == null) {
+            LTSResultManager.outputDir = LTSResultManager.DEFAULT_OUTPUT_DIR;
+        } else {
+            LTSResultManager.outputDir = outputDir;
+        }
+
+        if (isCUI) {
+            // ===
+            // CUI
+            // ===
+            String command = args[0];
 
             String inputFilePath = commandLine.getOptionValue("f");
             String targetName = commandLine.getOptionValue("t");
@@ -3613,27 +3628,27 @@ public class HPWindow extends JFrame implements Runnable {
 
             CUIManager manager = new CUIManager(command, inputFilePath, targetName, sleepTime);
             manager.run();
-            return;
-        }
-
-
-        // GUI
-        String lf = UIManager.getSystemLookAndFeelClassName();
-        try {
-            UIManager.setLookAndFeel(lf);
-        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }
-
-        HPWindow window = new HPWindow(null);
-        window.setTitle("MTS Analyser");
-        window.pack();
-        HPWindow.centre(window);
-        window.setVisible(true);
-        if (args.length > 0) {
-            SwingUtilities.invokeLater(new ScheduleOpenFile(window, args[0]));
         } else {
-            window.currentDirectory = System.getProperty("user.home");
+            // ===
+            // GUI
+            // ===
+            String lf = UIManager.getSystemLookAndFeelClassName();
+            try {
+                UIManager.setLookAndFeel(lf);
+            } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
+                e.printStackTrace();
+            }
+
+            HPWindow window = new HPWindow(null);
+            window.setTitle("MTS Analyser");
+            window.pack();
+            HPWindow.centre(window);
+            window.setVisible(true);
+            if (args.length > 0) {
+                SwingUtilities.invokeLater(new ScheduleOpenFile(window, args[0]));
+            } else {
+                window.currentDirectory = System.getProperty("user.home");
+            }
         }
     }
 

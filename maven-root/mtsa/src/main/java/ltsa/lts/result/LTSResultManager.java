@@ -16,10 +16,11 @@ import java.util.Set;
 public class LTSResultManager {
     public static LTSResult data = null;
     public static final ZoneId JST = ZoneId.of("Asia/Tokyo");
-    public static final String BASE_RESULT_DATA_DIR = "../../resultdata";
+    public static final String DEFAULT_OUTPUT_DIR = "../../resultdata";
 
     public static LTSResultStep currentStep = LTSResultStep.INIT;
     public static HashSet<String> controllableActions;
+    public static String outputDir = null;
 
     public static void init(String mode, String command, String inputFilePath, String target) {
         data = new LTSResult(mode, command, inputFilePath, target);
@@ -45,7 +46,7 @@ public class LTSResultManager {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String prefix = formatter.format(data.getStartedAt());
 
-        return String.format("%s/%s_%s_%s_%s.json", BASE_RESULT_DATA_DIR, prefix, data.getLts(), data.getTarget(), data.getCommand());
+        return String.format("%s/%s_%s_%s_%s.json", outputDir, prefix, data.getLts(), data.getTarget(), data.getCommand());
     }
 
     public static void setControllableActions(Set<String> controllableActions) {
