@@ -1,7 +1,11 @@
 package ltsa.ui;
 
+import MTSTools.ac.ic.doc.mtstools.model.MTS;
+import ltsa.ac.ic.doc.mtstools.util.fsp.AutomataToMTSConverter;
+import ltsa.control.util.ControllerUtils;
 import ltsa.dispatcher.TransitionSystemDispatcher;
 import ltsa.lts.*;
+import ltsa.lts.result.LTSResultCompileStepFinalModel;
 import ltsa.lts.result.LTSResultManager;
 import ltsa.lts.result.LTSResultStep;
 
@@ -46,15 +50,30 @@ class CUIManager {
             LTSInputString ltsInputString,
             LTSOutput ltsOutput,
             String currentDirectory,
-            String TargetControllerName
+            String targetControllerName
     ) {
         CompositeState cs = null;
         LTSCompiler comp = new LTSCompiler(ltsInputString, ltsOutput, currentDirectory);
         try {
             comp.compile();
-            cs = comp.continueCompilation(TargetControllerName);
+            cs = comp.continueCompilation(targetControllerName);
+
+            LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+            for (CompactState machine : cs.machines) {
+                MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
+                finalModel.setNumberOfStates(mts.getStates().size());
+                int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                finalModel.setNumberOfTransitions(numberOfTransitions);
+                Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                finalModel.setNumberOfUncontrollableActions(
+                        numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                );
+                LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+            }
         } catch (LTSCompositionException x) {
-            ltsOutput.outln("Construction of " + TargetControllerName + " aborted.");
+            ltsOutput.outln("Construction of " + targetControllerName + " aborted.");
             cs = null;
             return cs;
         } catch (LTSException x) {
@@ -71,9 +90,9 @@ class CUIManager {
             String currentDirectory,
             String targetName
     ) {
-        long maxMemoryUsage = 0;
-        long maxStates = 0;
-        long maxTransitions = 0;
+        HPWindow.maxMemoryUsage = 0;
+        HPWindow.maxStates = 0;
+        HPWindow.maxTransitions = 0;
 
         long startTime = System.currentTimeMillis();
 
@@ -123,11 +142,13 @@ class CUIManager {
         ltsOutput.outln("");
         ltsOutput.outln("");
         ltsOutput.outln("[info] Composition is Complete!");
-        ltsOutput.outln("[info] Maximum State       : " + maxStates);
-        ltsOutput.outln("[info] Maximum Transition  : " + maxTransitions);
-        ltsOutput.outln("[info] Maximum Memory (KB) : " + maxMemoryUsage);
+        ltsOutput.outln("[info] Maximum State       : " + HPWindow.maxStates);
+        ltsOutput.outln("[info] Maximum Transition  : " + HPWindow.maxTransitions);
+        ltsOutput.outln("[info] Maximum Memory (KB) : " + HPWindow.maxMemoryUsage);
         ltsOutput.outln("[info] Execution Time (ms) : " + executionTime);
         ltsOutput.outln("");
+
+        LTSResultManager.data.setMaxMemoryUsage(HPWindow.maxMemoryUsage);
     }
 
     // === [END] PARTIAL COPY FROM HPWindow ===
