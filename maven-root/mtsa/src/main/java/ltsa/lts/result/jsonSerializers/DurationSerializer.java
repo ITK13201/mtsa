@@ -1,4 +1,4 @@
-package ltsa.lts.result;
+package ltsa.lts.result.jsonSerializers;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;

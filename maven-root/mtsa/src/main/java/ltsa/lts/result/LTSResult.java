@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
+import ltsa.lts.result.jsonSerializers.DurationSerializer;
+import ltsa.lts.result.jsonSerializers.ZonedDateTimeSerializer;
 
 import java.io.File;
 import java.lang.reflect.Modifier;

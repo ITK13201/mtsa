@@ -13,13 +13,16 @@ rem =========
 rem SETTINGS
 rem =========
 rem java
-set MEMORY_FLAG=-Xmx256G
+set MEMORY_FLAG=-Xmx225G
 set VERSION=PCS_MachineLearning_v0.0.3
 set TARGET=mtsa-%VERSION%.jar
 rem mtsa
-set ARG_INPUT_BASE_DIR=input
-set ARG_OUTPUT_DIR=output
-set ARG_TARGET=TraditionalController
+set MTSA_INPUT_DIR=input
+set MTSA_OUTPUT_DIR=output
+set MTSA_TARGET=TraditionalController
+set MTSA_LOG_DIR=log
+rem sleep (ms)
+set SLEEP_TIME=10000
 
 rem ============
 rem INPUT FILES
@@ -100,23 +103,38 @@ rem EXECUTE MTSA
 rem =============
 rem AT
 for /L %%i in (0,1,11) do (
-    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%ARG_INPUT_BASE_DIR%\%%AT[%%i]%%" -t %ARG_TARGET% -o %ARG_OUTPUT_DIR%
+    call echo %date% %time% "Started to execute %%AT[%%i]%%..."
+    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%MTSA_INPUT_DIR%\%%AT[%%i]%%" -t %MTSA_TARGET% -o %MTSA_OUTPUT_DIR% > "%MTSA_LOG_DIR%\%%AT[%%i]%%.log"
+    call echo %date% %time% "Finished to execute %%AT[%%i]%%."
+    sleep -m %SLEEP_TIME%
 )
 rem ART_GALLERY
 for /L %%i in (0,1,15) do (
-    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%ARG_INPUT_BASE_DIR%\%%ART_GALLERY[%%i]%%" -t %ARG_TARGET% -o %ARG_OUTPUT_DIR%
+    call echo %date% %time% "Started to execute %%ART_GALLERY[%%i]%%..."
+    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%MTSA_INPUT_DIR%\%%ART_GALLERY[%%i]%%" -t %MTSA_TARGET% -o %MTSA_OUTPUT_DIR% > "%MTSA_LOG_DIR%\%%ART_GALLERY[%%i]%%.log"
+    call echo %date% %time% "Finished to execute %%ART_GALLERY[%%i]%%."
+    sleep -m %SLEEP_TIME%
 )
 rem BW
 for /L %%i in (0,1,16) do (
-    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%ARG_INPUT_BASE_DIR%\%%BW[%%i]%%" -t %ARG_TARGET% -o %ARG_OUTPUT_DIR%
+    call echo %date% %time% "Started to execute %%BW[%%i]%%..."
+    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%MTSA_INPUT_DIR%\%%BW[%%i]%%" -t %MTSA_TARGET% -o %MTSA_OUTPUT_DIR% > "%MTSA_LOG_DIR%\%%BW[%%i]%%.log"
+    call echo %date% %time% "Finished to execute %%BW[%%i]%%."
+    sleep -m %SLEEP_TIME%
 )
 rem CM
 for /L %%i in (0,1,16) do (
-    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%ARG_INPUT_BASE_DIR%\%%CM[%%i]%%" -t %ARG_TARGET% -o %ARG_OUTPUT_DIR%
+    call echo %date% %time% "Started to execute %%CM[%%i]%%..."
+    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%MTSA_INPUT_DIR%\%%CM[%%i]%%" -t %MTSA_TARGET% -o %MTSA_OUTPUT_DIR% > "%MTSA_LOG_DIR%\%%CM[%%i]%%.log"
+    call echo %date% %time% "Finished to execute %%CM[%%i]%%..."
+    sleep -m %SLEEP_TIME%
 )
 rem KIVA_SYSTEM
 for /L %%i in (0,1,6) do (
-    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%ARG_INPUT_BASE_DIR%\%%KIVA_SYSTEM[%%i]%%" -t %ARG_TARGET% -o %ARG_OUTPUT_DIR%
+    call echo %date% %time% "Started to execute %%KIVA_SYSTEM[%%i]%%..."
+    call java %MEMORY_FLAG% -jar %TARGET% compose -f "%MTSA_INPUT_DIR%\%%KIVA_SYSTEM[%%i]%%" -t %MTSA_TARGET% -o %MTSA_OUTPUT_DIR% > "%MTSA_LOG_DIR%\%%KIVA_SYSTEM[%%i]%%.log"
+    call echo %date% %time% "Finished to execute %%KIVA_SYSTEM[%%i]%%."
+    sleep -m %SLEEP_TIME%
 )
 
 endlocal
