@@ -5,9 +5,7 @@ import ltsa.ac.ic.doc.mtstools.util.fsp.AutomataToMTSConverter;
 import ltsa.control.util.ControllerUtils;
 import ltsa.dispatcher.TransitionSystemDispatcher;
 import ltsa.lts.*;
-import ltsa.lts.result.LTSResultCompileStepFinalModel;
-import ltsa.lts.result.LTSResultManager;
-import ltsa.lts.result.LTSResultStep;
+import ltsa.lts.result.*;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -59,6 +57,7 @@ class CUIManager {
             cs = comp.continueCompilation(targetControllerName);
 
             LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+
             for (CompactState machine : cs.machines) {
                 MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
                 LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
@@ -71,6 +70,26 @@ class CUIManager {
                         numberOfTransitions - Math.toIntExact(numberOfControllableActions)
                 );
                 LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+            }
+
+            for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                environment.initialize(cs.goal, ltsOutput);
+            }
+
+            // TEMP
+            for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
+                if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
+                    continue;
+                }
+
+                LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
+                        finalModel.getName(),
+                        finalModel.getNumberOfStates(),
+                        finalModel.getNumberOfTransitions(),
+                        finalModel.getNumberOfControllableActions(),
+                        finalModel.getNumberOfUncontrollableActions()
+                );
+                LTSResultManager.data.getInitialModels().requirements.add(requirement);
             }
         } catch (LTSCompositionException x) {
             ltsOutput.outln("Construction of " + targetControllerName + " aborted.");

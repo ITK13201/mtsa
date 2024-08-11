@@ -24,6 +24,7 @@ public class LTSResult {
     private String lts;
 
     // additional parameters
+    private LTSResultInitialModels initialModels;
     private LTSResultCompileStep compileStep;
     private LTSResultComposeStep composeStep;
 
@@ -40,6 +41,7 @@ public class LTSResult {
         this.ltsFilePath = ltsFilePath;
         this.target = target;
         this.lts = this.getLTSNameFromInputFilePath(ltsFilePath);
+        this.initialModels = new LTSResultInitialModels();
         this.compileStep = new LTSResultCompileStep();
         this.composeStep = new LTSResultComposeStep();
     }

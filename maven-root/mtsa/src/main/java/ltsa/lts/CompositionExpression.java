@@ -10,6 +10,8 @@ import ltsa.lts.chart.TriggeredScenarioDefinition;
 import ltsa.lts.chart.util.TriggeredScenarioTransformationException;
 import ltsa.lts.distribution.DistributionDefinition;
 import ltsa.lts.ltl.AssertDefinition;
+import ltsa.lts.result.LTSResultInitialModelsEnvironment;
+import ltsa.lts.result.LTSResultManager;
 import ltsa.lts.util.MTSUtils;
 import org.apache.commons.lang.Validate;
 
@@ -594,10 +596,14 @@ class ProcessRef {
             }
             c.compiledProcesses.put(mach.name, mach); // add to compiled
             // processes
-            if (!p.imported())
+            if (!p.imported()) {
                 c.output.outln("Compiled: " + mach.name);
-            else
+                // add to result
+                LTSResultInitialModelsEnvironment environment = new LTSResultInitialModelsEnvironment(mach);
+                LTSResultManager.data.getInitialModels().environments.add(environment);
+            } else {
                 c.output.outln("Imported: " + mach.name);
+            }
             return true;
         }
         return false;

@@ -31,9 +31,7 @@ import ltsa.jung.LTSJUNGCanvas.EnumLayout;
 import ltsa.lts.*;
 import ltsa.lts.ltl.AssertDefinition;
 import ltsa.lts.ltl.FormulaFactory;
-import ltsa.lts.result.LTSResultCompileStepFinalModel;
-import ltsa.lts.result.LTSResultManager;
-import ltsa.lts.result.LTSResultStep;
+import ltsa.lts.result.*;
 import ltsa.lts.util.MTSUtils;
 import ltsa.ui.enactment.EnactorOptionsWindows;
 import ltsa.ui.update.UpdateGraphSimulation;
@@ -2016,6 +2014,25 @@ public class HPWindow extends JFrame implements Runnable {
                 LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
             }
 
+            for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                environment.initialize(cs.goal, ltsOutput);
+            }
+
+            // TEMP
+            for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
+                if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
+                    continue;
+                }
+
+                LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
+                        finalModel.getName(),
+                        finalModel.getNumberOfStates(),
+                        finalModel.getNumberOfTransitions(),
+                        finalModel.getNumberOfControllableActions(),
+                        finalModel.getNumberOfUncontrollableActions()
+                );
+                LTSResultManager.data.getInitialModels().requirements.add(requirement);
+            }
         } catch (LTSCompositionException x) {
             ltsOutput.outln("Construction of " + targetChoice.getSelectedItem() + " aborted.");
             cs = null;
