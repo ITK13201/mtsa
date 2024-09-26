@@ -2034,8 +2034,15 @@ public class TransitionSystemDispatcher {
             // ToMarian: add this (most of it?) code to a new class
             // LTSControlProblem
             output.outln("Solving the LTS control problem.");
-            LTSResultManager.currentStep = LTSResultStep.COMPOSE_SOLVING_PROBLEM;
 
+            switch (LTSResultManager.mode) {
+                case ENABLED:
+                    LTSResultManager.currentStep = LTSResultStep.COMPOSE_SOLVING_PROBLEM;
+                    break;
+                case ONLY_PERFORMANCE:
+                case DISABLED:
+                    break;
+            }
 
             MTS<StrategyState<Long, Integer>, String> synthesised = null;
             MTS<Long, String> env = AutomataToMTSConverter.getInstance().convert(c);
@@ -2086,10 +2093,17 @@ public class TransitionSystemDispatcher {
                     long endTime = System.currentTimeMillis();
                     output.outln("Analysis time: " + (endTime - initialTime) + "ms.");
                     // add to result
-                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
-                            getComposeStep().
-                            solvingProblem;
-                    solvingProblemResult.setSolvingDuration(Duration.ofMillis(endTime - initialTime));
+                    switch (LTSResultManager.mode) {
+                        case ENABLED:
+                            LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                                    getComposeStep().
+                                    solvingProblem;
+                            solvingProblemResult.setSolvingDuration(Duration.ofMillis(endTime - initialTime));
+                            break;
+                        case ONLY_PERFORMANCE:
+                        case DISABLED:
+                            break;
+                    }
 
                     output.outln("Controller [" + plainController.getStates().size() + "] generated successfully.");
                     CompactState controller = MTSToAutomataConverter.getInstance().convert(plainController,

@@ -599,8 +599,15 @@ class ProcessRef {
             if (!p.imported()) {
                 c.output.outln("Compiled: " + mach.name);
                 // add to result
-                LTSResultInitialModelsEnvironment environment = new LTSResultInitialModelsEnvironment(mach);
-                LTSResultManager.data.getInitialModels().environments.add(environment);
+                switch (LTSResultManager.mode) {
+                    case ENABLED:
+                        LTSResultInitialModelsEnvironment environment = new LTSResultInitialModelsEnvironment(mach);
+                        LTSResultManager.data.getInitialModels().environments.add(environment);
+                        break;
+                    case ONLY_PERFORMANCE:
+                    case DISABLED:
+                        break;
+                }
             } else {
                 c.output.outln("Imported: " + mach.name);
             }

@@ -21,6 +21,8 @@ public class LTSResultManager {
     public static LTSResultStep currentStep = LTSResultStep.INIT;
     public static HashSet<String> controllableActions;
     public static String outputDir = null;
+    public static LTSResultMode mode = LTSResultMode.ENABLED;
+
 
     public static void init(String mode, String command, String inputFilePath, String target) {
         data = new LTSResult(mode, command, inputFilePath, target);

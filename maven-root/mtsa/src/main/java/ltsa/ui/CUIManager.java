@@ -56,40 +56,48 @@ class CUIManager {
             comp.compile();
             cs = comp.continueCompilation(targetControllerName);
 
-            LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+            switch (LTSResultManager.mode) {
+                case ENABLED:
+                    LTSResultManager.setControllableActions(cs.goal.getControllableActions());
 
-            for (CompactState machine : cs.machines) {
-                MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
-                LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
-                finalModel.setNumberOfStates(mts.getStates().size());
-                int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
-                finalModel.setNumberOfTransitions(numberOfTransitions);
-                Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
-                finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
-                finalModel.setNumberOfUncontrollableActions(
-                        numberOfTransitions - Math.toIntExact(numberOfControllableActions)
-                );
-                LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
-            }
 
-            for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                environment.initialize(cs.goal, ltsOutput);
-            }
+                    for (CompactState machine : cs.machines) {
+                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                        LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
+                        finalModel.setNumberOfStates(mts.getStates().size());
+                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                        finalModel.setNumberOfTransitions(numberOfTransitions);
+                        Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                        finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        finalModel.setNumberOfUncontrollableActions(
+                                numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                        );
+                        LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+                    }
 
-            // TEMP
-            for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
-                if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
-                    continue;
-                }
+                    for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                        environment.initialize(cs.goal, ltsOutput);
+                    }
 
-                LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
-                        finalModel.getName(),
-                        finalModel.getNumberOfStates(),
-                        finalModel.getNumberOfTransitions(),
-                        finalModel.getNumberOfControllableActions(),
-                        finalModel.getNumberOfUncontrollableActions()
-                );
-                LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                    // TEMP
+                    for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
+                        if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
+                            continue;
+                        }
+
+                        LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
+                                finalModel.getName(),
+                                finalModel.getNumberOfStates(),
+                                finalModel.getNumberOfTransitions(),
+                                finalModel.getNumberOfControllableActions(),
+                                finalModel.getNumberOfUncontrollableActions()
+                        );
+                        LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                    }
+                    break;
+                case ONLY_PERFORMANCE:
+                case DISABLED:
+                    break;
             }
         } catch (LTSCompositionException x) {
             ltsOutput.outln("Construction of " + targetControllerName + " aborted.");
@@ -115,7 +123,14 @@ class CUIManager {
 
         long startTime = System.currentTimeMillis();
 
-        LTSResultManager.currentStep = LTSResultStep.COMPILE;
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                LTSResultManager.currentStep = LTSResultStep.COMPILE;
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
+        }
 
         CompositeState cs = this.doCompile(ltsInputString, ltsOutput, currentDirectory, targetName);
         ltsOutput.outln("Compile is Complete!");
@@ -126,7 +141,14 @@ class CUIManager {
         ltsOutput.outln("                    Composition                    ");
         ltsOutput.outln("===================================================");
 
-        LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
+        }
 
         TransitionSystemDispatcher.applyComposition(cs, ltsOutput);
 
@@ -167,7 +189,14 @@ class CUIManager {
         ltsOutput.outln("[info] Execution Time (ms) : " + executionTime);
         ltsOutput.outln("");
 
-        LTSResultManager.data.setMaxMemoryUsage(HPWindow.maxMemoryUsage);
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                LTSResultManager.data.setMaxMemoryUsage(HPWindow.maxMemoryUsage);
+                break;
+            case DISABLED:
+                break;
+        }
     }
 
     // === [END] PARTIAL COPY FROM HPWindow ===
@@ -177,11 +206,18 @@ class CUIManager {
         CUIOutput ltsOutput = new CUIOutput();
         String currentDirectory = ".";
 
-        LTSResultManager.start();
-        doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
-        LTSResultManager.finish();
-
-        LTSResultManager.dump();
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                LTSResultManager.start();
+                doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
+                LTSResultManager.finish();
+                LTSResultManager.dump();
+                break;
+            case DISABLED:
+                doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
+                break;
+        }
     }
 
     private void runCompose(String input, String targetName) {
@@ -189,11 +225,18 @@ class CUIManager {
         CUIOutput ltsOutput = new CUIOutput();
         String currentDirectory = ".";
 
-        LTSResultManager.start();
-        doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
-        LTSResultManager.finish();
-
-        LTSResultManager.dump();
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                LTSResultManager.start();
+                doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
+                LTSResultManager.finish();
+                LTSResultManager.dump();
+                break;
+            case DISABLED:
+                doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
+                break;
+        }
     }
 
     public void run() {
@@ -206,7 +249,14 @@ class CUIManager {
             }
         }
 
-        LTSResultManager.init("CUI", this.command, this.inputFilePath, this.targetName);
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                LTSResultManager.init("CUI", this.command, this.inputFilePath, this.targetName);
+                break;
+            case DISABLED:
+                break;
+        }
 
         String input = readFile(this.inputFilePath);
         switch (this.command) {

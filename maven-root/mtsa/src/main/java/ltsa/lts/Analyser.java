@@ -242,41 +242,47 @@ public class Analyser implements Animator, Automata {
         }
 
         // add to result
-        if (! this.cs.name.equals("DEFAULT")) {
-            switch (LTSResultManager.currentStep) {
-                case INIT:
-                case COMPILE:
-                    LTSResultCompileStepEnvironment environmentResult = new LTSResultCompileStepEnvironment(this.cs.name);
-                    environmentResult.setNumberOfMaxStates(numberOfMaxStates);
-                    for (CompactState compactState : this.sm) {
-                        environmentResult.sourceModels.add(compactState.name);
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                if (! this.cs.name.equals("DEFAULT")) {
+                    switch (LTSResultManager.currentStep) {
+                        case INIT:
+                        case COMPILE:
+                            LTSResultCompileStepEnvironment environmentResult = new LTSResultCompileStepEnvironment(this.cs.name);
+                            environmentResult.setNumberOfMaxStates(numberOfMaxStates);
+                            for (CompactState compactState : this.sm) {
+                                environmentResult.sourceModels.add(compactState.name);
+                            }
+                            LTSResultManager.data.getCompileStep().environments.add(environmentResult);
+                            break;
+                        case COMPOSE:
+                        case COMPOSE_CREATING_GAME_SPACE:
+                            LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
+                                    getComposeStep().
+                                    creatingGameSpace;
+                            creatingGameSpaceResult.setNumberOfMaxStates(numberOfMaxStates);
+                            for (CompactState compactState : this.sm) {
+                                creatingGameSpaceResult.sourceModels.add(compactState.name);
+                            }
+                            LTSResultManager.data.getComposeStep().creatingGameSpace = creatingGameSpaceResult;
+                            break;
+                        case COMPOSE_SOLVING_PROBLEM:
+                            LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                                    getComposeStep().
+                                    solvingProblem;
+                            solvingProblemResult.setNumberOfMaxStates(numberOfMaxStates);
+                            for (CompactState compactState : this.sm) {
+                                solvingProblemResult.sourceModels.add(compactState.name);
+                            }
+                            LTSResultManager.data.getComposeStep().solvingProblem = solvingProblemResult;
+                            break;
                     }
-                    LTSResultManager.data.getCompileStep().environments.add(environmentResult);
-                    break;
-                case COMPOSE:
-                case COMPOSE_CREATING_GAME_SPACE:
-                    LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
-                            getComposeStep().
-                            creatingGameSpace;
-                    creatingGameSpaceResult.setNumberOfMaxStates(numberOfMaxStates);
-                    for (CompactState compactState : this.sm) {
-                        creatingGameSpaceResult.sourceModels.add(compactState.name);
-                    }
-                    LTSResultManager.data.getComposeStep().creatingGameSpace = creatingGameSpaceResult;
-                    break;
-                case COMPOSE_SOLVING_PROBLEM:
-                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
-                            getComposeStep().
-                            solvingProblem;
-                    solvingProblemResult.setNumberOfMaxStates(numberOfMaxStates);
-                    for (CompactState compactState : this.sm) {
-                        solvingProblemResult.sourceModels.add(compactState.name);
-                    }
-                    LTSResultManager.data.getComposeStep().solvingProblem = solvingProblemResult;
-                    break;
-            }
+                }
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
         }
-
     }
 
     private MyList compTrans; // list of transitions
@@ -310,58 +316,64 @@ public class Analyser implements Animator, Automata {
         output.outln("Composed in " + (finish - start) + "ms");
 
         // add to result
-        if (! this.cs.name.equals("DEFAULT")) {
-            MTS<Long, String> env = AutomataToMTSConverter.getInstance().convert(c);
-            Long numberOfControllableActions = null;
-            if (this.cs.goal != null) {
-                numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(env, this.cs.goal, output);
-            }
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                if (!this.cs.name.equals("DEFAULT")) {
+                    MTS<Long, String> env = AutomataToMTSConverter.getInstance().convert(c);
+                    Long numberOfControllableActions = null;
+                    if (this.cs.goal != null) {
+                        numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(env, this.cs.goal, output);
+                    }
 
-            switch (LTSResultManager.currentStep) {
-                case INIT:
-                case COMPILE:
-                    LTSResultCompileStepEnvironment environmentResult = LTSResultManager.data.
-                            getCompileStep().
-                            environments.
-                            get(LTSResultManager.data.getCompileStep().environments.size() - 1);
-                    environmentResult.setNumberOfStates(explorerContext.stateCount);
-                    environmentResult.setNumberOfTransitions(compTrans.size());
-                    environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
-                    break;
-                case COMPOSE:
-                case COMPOSE_CREATING_GAME_SPACE:
-                    LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
-                            getComposeStep().
-                            creatingGameSpace;
-                    // Add 1 to the number of states in order to add the violating state, -1,
-                    // when creating the game space.
-                    creatingGameSpaceResult.setNumberOfStates(explorerContext.stateCount + 1);
-                    creatingGameSpaceResult.setNumberOfTransitions(compTrans.size());
-                    creatingGameSpaceResult.setComposeDuration(Duration.ofMillis(finish - start));
-                    if (numberOfControllableActions != null) {
-                        creatingGameSpaceResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
-                        creatingGameSpaceResult.setNumberOfUncontrollableActions(
-                                compTrans.size() - Math.toIntExact(numberOfControllableActions)
-                        );
+                    switch (LTSResultManager.currentStep) {
+                        case INIT:
+                        case COMPILE:
+                            LTSResultCompileStepEnvironment environmentResult = LTSResultManager.data.
+                                    getCompileStep().
+                                    environments.
+                                    get(LTSResultManager.data.getCompileStep().environments.size() - 1);
+                            environmentResult.setNumberOfStates(explorerContext.stateCount);
+                            environmentResult.setNumberOfTransitions(compTrans.size());
+                            environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
+                            break;
+                        case COMPOSE:
+                        case COMPOSE_CREATING_GAME_SPACE:
+                            LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
+                                    getComposeStep().
+                                    creatingGameSpace;
+                            // Add 1 to the number of states in order to add the violating state, -1,
+                            // when creating the game space.
+                            creatingGameSpaceResult.setNumberOfStates(explorerContext.stateCount + 1);
+                            creatingGameSpaceResult.setNumberOfTransitions(compTrans.size());
+                            creatingGameSpaceResult.setComposeDuration(Duration.ofMillis(finish - start));
+                            if (numberOfControllableActions != null) {
+                                creatingGameSpaceResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                                creatingGameSpaceResult.setNumberOfUncontrollableActions(
+                                        compTrans.size() - Math.toIntExact(numberOfControllableActions)
+                                );
+                            }
+                            break;
+                        case COMPOSE_SOLVING_PROBLEM:
+                            LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
+                                    getComposeStep().
+                                    solvingProblem;
+                            solvingProblemResult.setNumberOfStates(explorerContext.stateCount);
+                            solvingProblemResult.setNumberOfTransitions(compTrans.size());
+                            solvingProblemResult.setComposeDuration(Duration.ofMillis(finish - start));
+                            if (numberOfControllableActions != null) {
+                                solvingProblemResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                                solvingProblemResult.setNumberOfUncontrollableActions(
+                                        compTrans.size() - Math.toIntExact(numberOfControllableActions)
+                                );
+                            }
+                            break;
                     }
-                    break;
-                case COMPOSE_SOLVING_PROBLEM:
-                    LTSResultComposeStepSolvingProblem solvingProblemResult = LTSResultManager.data.
-                            getComposeStep().
-                            solvingProblem;
-                    solvingProblemResult.setNumberOfStates(explorerContext.stateCount);
-                    solvingProblemResult.setNumberOfTransitions(compTrans.size());
-                    solvingProblemResult.setComposeDuration(Duration.ofMillis(finish - start));
-                    if (numberOfControllableActions != null) {
-                        solvingProblemResult.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
-                        solvingProblemResult.setNumberOfUncontrollableActions(
-                                compTrans.size() - Math.toIntExact(numberOfControllableActions)
-                        );
-                    }
-                    break;
-            }
+                }
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
         }
-
 
         compositionEngine.teardown();
         compTrans = null;

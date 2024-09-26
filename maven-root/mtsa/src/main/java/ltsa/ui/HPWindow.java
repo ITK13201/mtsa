@@ -973,21 +973,39 @@ public class HPWindow extends JFrame implements Runnable {
                     break;
                 case DO_compile:
                     showOutput();
-                    LTSResultManager.delete();
-                    LTSResultManager.init("GUI", "compile", this.openFile, (String) this.targetChoice.getSelectedItem());
-                    LTSResultManager.start();
-                    compile();
-                    LTSResultManager.finish();
-                    LTSResultManager.dump();
+
+                    switch (LTSResultManager.mode) {
+                        case ENABLED:
+                        case ONLY_PERFORMANCE:
+                            LTSResultManager.delete();
+                            LTSResultManager.init("GUI", "compile", this.openFile, (String) this.targetChoice.getSelectedItem());
+                            LTSResultManager.start();
+                            compile();
+                            LTSResultManager.finish();
+                            LTSResultManager.dump();
+                            break;
+                        case DISABLED:
+                            compile();
+                            break;
+                    }
                     break;
                 case DO_doComposition:
                     showOutput();
-                    LTSResultManager.delete();
-                    LTSResultManager.init("GUI", "compose", this.openFile, (String) this.targetChoice.getSelectedItem());
-                    LTSResultManager.start();
-                    doComposition();
-                    LTSResultManager.finish();
-                    LTSResultManager.dump();
+
+                    switch (LTSResultManager.mode) {
+                        case ENABLED:
+                        case ONLY_PERFORMANCE:
+                            LTSResultManager.delete();
+                            LTSResultManager.init("GUI", "compose", this.openFile, (String) this.targetChoice.getSelectedItem());
+                            LTSResultManager.start();
+                            doComposition();
+                            LTSResultManager.finish();
+                            LTSResultManager.dump();
+                            break;
+                        case DISABLED:
+                            doComposition();
+                            break;
+                    }
                     break;
                 case DO_minimiseComposition:
                     showOutput();
@@ -1999,39 +2017,46 @@ public class HPWindow extends JFrame implements Runnable {
 
             cs = comp.continueCompilation((String) targetChoice.getSelectedItem());
 
-            LTSResultManager.setControllableActions(cs.goal.getControllableActions());
-            for (CompactState machine: cs.machines) {
-                MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
-                LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
-                finalModel.setNumberOfStates(mts.getStates().size());
-                int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
-                finalModel.setNumberOfTransitions(numberOfTransitions);
-                Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
-                finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
-                finalModel.setNumberOfUncontrollableActions(
-                        numberOfTransitions - Math.toIntExact(numberOfControllableActions)
-                );
-                LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
-            }
+            switch (LTSResultManager.mode) {
+                case ENABLED:
+                    LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+                    for (CompactState machine : cs.machines) {
+                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                        LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
+                        finalModel.setNumberOfStates(mts.getStates().size());
+                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                        finalModel.setNumberOfTransitions(numberOfTransitions);
+                        Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                        finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        finalModel.setNumberOfUncontrollableActions(
+                                numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                        );
+                        LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+                    }
 
-            for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                environment.initialize(cs.goal, ltsOutput);
-            }
+                    for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                        environment.initialize(cs.goal, ltsOutput);
+                    }
 
-            // TEMP
-            for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
-                if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
-                    continue;
-                }
+                    // TEMP
+                    for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
+                        if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
+                            continue;
+                        }
 
-                LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
-                        finalModel.getName(),
-                        finalModel.getNumberOfStates(),
-                        finalModel.getNumberOfTransitions(),
-                        finalModel.getNumberOfControllableActions(),
-                        finalModel.getNumberOfUncontrollableActions()
-                );
-                LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                        LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
+                                finalModel.getName(),
+                                finalModel.getNumberOfStates(),
+                                finalModel.getNumberOfTransitions(),
+                                finalModel.getNumberOfControllableActions(),
+                                finalModel.getNumberOfUncontrollableActions()
+                        );
+                        LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                    }
+                    break;
+                case ONLY_PERFORMANCE:
+                case DISABLED:
+                    break;
             }
         } catch (LTSCompositionException x) {
             ltsOutput.outln("Construction of " + targetChoice.getSelectedItem() + " aborted.");
@@ -2198,7 +2223,15 @@ public class HPWindow extends JFrame implements Runnable {
         ltsOutput.clearOutput();
         long startTime = System.currentTimeMillis();
 
-            LTSResultManager.currentStep = LTSResultStep.COMPILE;
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                LTSResultManager.currentStep = LTSResultStep.COMPILE;
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
+        }
+
             compile();
             ltsOutput.outln("Compile is Complete!");
             ltsOutput.outln("");
@@ -2208,7 +2241,15 @@ public class HPWindow extends JFrame implements Runnable {
             ltsOutput.outln("                    Composition                    ");
             ltsOutput.outln("===================================================");
 
-            LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+                LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+                break;
+            case ONLY_PERFORMANCE:
+            case DISABLED:
+                break;
+        }
+
             TransitionSystemDispatcher.applyComposition(current, ltsOutput);
             postState(current);
 
@@ -2254,7 +2295,14 @@ public class HPWindow extends JFrame implements Runnable {
         ltsOutput.outln("[info] Execution Time (ms) : " + executionTime);
         ltsOutput.outln("");
 
-        LTSResultManager.data.setMaxMemoryUsage(maxMemoryUsage);
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                LTSResultManager.data.setMaxMemoryUsage(maxMemoryUsage);
+                break;
+            case DISABLED:
+                break;
+        }
     }
 
 
@@ -3608,6 +3656,7 @@ public class HPWindow extends JFrame implements Runnable {
 
         org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
         options.addOption("o", true, "Output (Result) Dir Path");
+        options.addOption("m", true, "Result Mode");
         if (isCUI) {
             options.addOption("f", true, "Input File (*.lts)");
             options.addOption("t", true, "Target Name (e.g., DirectedController)");
@@ -3622,11 +3671,34 @@ public class HPWindow extends JFrame implements Runnable {
             return;
         }
 
-        String outputDir = commandLine.getOptionValue("o");
-        if (outputDir == null) {
-            LTSResultManager.outputDir = LTSResultManager.DEFAULT_OUTPUT_DIR;
-        } else {
-            LTSResultManager.outputDir = outputDir;
+        String resultMode = commandLine.getOptionValue("m");
+        switch (resultMode) {
+            case "enabled":
+                LTSResultManager.mode = LTSResultMode.ENABLED;
+                break;
+            case "only-performance":
+                LTSResultManager.mode = LTSResultMode.ONLY_PERFORMANCE;
+                break;
+            case "disabled":
+                LTSResultManager.mode = LTSResultMode.DISABLED;
+                break;
+            default:
+                LTSResultManager.mode = LTSResultMode.ENABLED;
+                break;
+        }
+
+        switch (LTSResultManager.mode) {
+            case ENABLED:
+            case ONLY_PERFORMANCE:
+                String outputDir = commandLine.getOptionValue("o");
+                if (outputDir == null) {
+                    LTSResultManager.outputDir = LTSResultManager.DEFAULT_OUTPUT_DIR;
+                } else {
+                    LTSResultManager.outputDir = outputDir;
+                }
+                break;
+            case DISABLED:
+                break;
         }
 
         if (isCUI) {
