@@ -1,9 +1,9 @@
-REMOTE_JVM_FLAG	= -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-MEMORY_FLAG		= -Xmx20G
-JAR_FLAG		= -jar
-TARGET			= ./target/mtsa.jar
-MTSA_TARGET     = TraditionalController
-MTSA_RESULT_MODE = enabled
+REMOTE_JVM_FLAG		= -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+MEMORY_FLAG			= -Xmx20G
+JAR_FLAG			= -jar
+TARGET				= ./target/mtsa.jar
+MTSA_TARGET			= TraditionalController
+MTSA_RESULT_MODE	= for-machine-learning
 
 clean:
 	mvn clean

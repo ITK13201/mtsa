@@ -280,6 +280,7 @@ public class Analyser implements Animator, Automata {
                 }
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }
@@ -371,6 +372,7 @@ public class Analyser implements Animator, Automata {
                 }
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }

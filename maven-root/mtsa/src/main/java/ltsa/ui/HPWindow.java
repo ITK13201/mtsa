@@ -977,6 +977,7 @@ public class HPWindow extends JFrame implements Runnable {
                     switch (LTSResultManager.mode) {
                         case ENABLED:
                         case ONLY_PERFORMANCE:
+                        case FOR_MACHINE_LEARNING:
                             LTSResultManager.delete();
                             LTSResultManager.init("GUI", "compile", this.openFile, (String) this.targetChoice.getSelectedItem());
                             LTSResultManager.start();
@@ -995,6 +996,7 @@ public class HPWindow extends JFrame implements Runnable {
                     switch (LTSResultManager.mode) {
                         case ENABLED:
                         case ONLY_PERFORMANCE:
+                        case FOR_MACHINE_LEARNING:
                             LTSResultManager.delete();
                             LTSResultManager.init("GUI", "compose", this.openFile, (String) this.targetChoice.getSelectedItem());
                             LTSResultManager.start();
@@ -2038,7 +2040,6 @@ public class HPWindow extends JFrame implements Runnable {
                         environment.initialize(cs.goal, ltsOutput);
                     }
 
-                    // TEMP
                     for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
                         if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
                             continue;
@@ -2054,6 +2055,31 @@ public class HPWindow extends JFrame implements Runnable {
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
                     break;
+                case FOR_MACHINE_LEARNING:
+                    LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+
+                    // environments
+                    for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                        environment.initialize(cs.goal, ltsOutput);
+                    }
+
+                    // requirements
+                    for (CompactState machine : cs.machines) {
+                        if (machine.name.equals("Environment")) {
+                            continue;
+                        }
+                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                        LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(machine.name);
+                        requirement.setNumberOfStates(mts.getStates().size());
+                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                        requirement.setNumberOfTransitions(numberOfTransitions);
+                        Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                        requirement.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        requirement.setNumberOfUncontrollableActions(
+                                numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                        );
+                        LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                    }
                 case ONLY_PERFORMANCE:
                 case DISABLED:
                     break;
@@ -2228,6 +2254,7 @@ public class HPWindow extends JFrame implements Runnable {
                 LTSResultManager.currentStep = LTSResultStep.COMPILE;
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }
@@ -2246,6 +2273,7 @@ public class HPWindow extends JFrame implements Runnable {
                 LTSResultManager.currentStep = LTSResultStep.COMPOSE;
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }
@@ -2298,6 +2326,7 @@ public class HPWindow extends JFrame implements Runnable {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 LTSResultManager.data.setMaxMemoryUsage(maxMemoryUsage);
                 break;
             case DISABLED:
@@ -3679,6 +3708,9 @@ public class HPWindow extends JFrame implements Runnable {
             case "only-performance":
                 LTSResultManager.mode = LTSResultMode.ONLY_PERFORMANCE;
                 break;
+            case "for-machine-learning":
+                LTSResultManager.mode = LTSResultMode.FOR_MACHINE_LEARNING;
+                break;
             case "disabled":
                 LTSResultManager.mode = LTSResultMode.DISABLED;
                 break;
@@ -3690,6 +3722,7 @@ public class HPWindow extends JFrame implements Runnable {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 String outputDir = commandLine.getOptionValue("o");
                 if (outputDir == null) {
                     LTSResultManager.outputDir = LTSResultManager.DEFAULT_OUTPUT_DIR;

@@ -147,6 +147,7 @@ public class Minimiser {
                 LTSResultManager.data.getCompileStep().requirements.add(requirementResult);
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }

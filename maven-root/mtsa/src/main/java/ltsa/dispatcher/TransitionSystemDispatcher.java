@@ -2040,6 +2040,7 @@ public class TransitionSystemDispatcher {
                     LTSResultManager.currentStep = LTSResultStep.COMPOSE_SOLVING_PROBLEM;
                     break;
                 case ONLY_PERFORMANCE:
+                case FOR_MACHINE_LEARNING:
                 case DISABLED:
                     break;
             }
@@ -2101,6 +2102,7 @@ public class TransitionSystemDispatcher {
                             solvingProblemResult.setSolvingDuration(Duration.ofMillis(endTime - initialTime));
                             break;
                         case ONLY_PERFORMANCE:
+                        case FOR_MACHINE_LEARNING:
                         case DISABLED:
                             break;
                     }

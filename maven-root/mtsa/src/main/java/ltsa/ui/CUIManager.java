@@ -79,7 +79,6 @@ class CUIManager {
                         environment.initialize(cs.goal, ltsOutput);
                     }
 
-                    // TEMP
                     for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
                         if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
                             continue;
@@ -95,6 +94,31 @@ class CUIManager {
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
                     break;
+                case FOR_MACHINE_LEARNING:
+                    LTSResultManager.setControllableActions(cs.goal.getControllableActions());
+
+                    // environments
+                    for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
+                        environment.initialize(cs.goal, ltsOutput);
+                    }
+
+                    // requirements
+                    for (CompactState machine : cs.machines) {
+                        if (machine.name.equals("Environment")) {
+                            continue;
+                        }
+                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
+                        LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(machine.name);
+                        requirement.setNumberOfStates(mts.getStates().size());
+                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                        requirement.setNumberOfTransitions(numberOfTransitions);
+                        Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
+                        requirement.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
+                        requirement.setNumberOfUncontrollableActions(
+                                numberOfTransitions - Math.toIntExact(numberOfControllableActions)
+                        );
+                        LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                    }
                 case ONLY_PERFORMANCE:
                 case DISABLED:
                     break;
@@ -128,6 +152,7 @@ class CUIManager {
                 LTSResultManager.currentStep = LTSResultStep.COMPILE;
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }
@@ -146,6 +171,7 @@ class CUIManager {
                 LTSResultManager.currentStep = LTSResultStep.COMPOSE;
                 break;
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
             case DISABLED:
                 break;
         }
@@ -192,6 +218,7 @@ class CUIManager {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 LTSResultManager.data.setMaxMemoryUsage(HPWindow.maxMemoryUsage);
                 break;
             case DISABLED:
@@ -209,6 +236,7 @@ class CUIManager {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 LTSResultManager.start();
                 doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
                 LTSResultManager.finish();
@@ -228,6 +256,7 @@ class CUIManager {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 LTSResultManager.start();
                 doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
                 LTSResultManager.finish();
@@ -252,6 +281,7 @@ class CUIManager {
         switch (LTSResultManager.mode) {
             case ENABLED:
             case ONLY_PERFORMANCE:
+            case FOR_MACHINE_LEARNING:
                 LTSResultManager.init("CUI", this.command, this.inputFilePath, this.targetName);
                 break;
             case DISABLED:
