@@ -119,6 +119,10 @@ class CUIManager {
                         );
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
+
+                    // input models result dump
+                    LTSResultManager.dump_input_models();
+                    break;
                 case ONLY_PERFORMANCE:
                 case DISABLED:
                     break;

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -47,12 +48,32 @@ public class LTSResultManager {
     private static String getResultFilePath() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String prefix = formatter.format(data.getStartedAt());
+        Path path = Paths.get(outputDir, String.format("%s_%s_%s_%s.json", prefix, data.getLts(), data.getTarget(), data.getCommand()));
 
-        return String.format("%s/%s_%s_%s_%s.json", outputDir, prefix, data.getLts(), data.getTarget(), data.getCommand());
+        return path.toString();
+    }
+
+    private static String getInputModelsResultFilePath() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
+        String prefix = formatter.format(data.getStartedAt());
+        Path path = Paths.get(outputDir, "input-models", String.format("%s_%s_%s_%s.json", prefix, data.getLts(), data.getTarget(), data.getCommand()));
+
+        return path.toString();
     }
 
     public static void setControllableActions(Set<String> controllableActions) {
         LTSResultManager.controllableActions.addAll(controllableActions);
+    }
+
+    public static void dump_input_models() {
+        try (
+                BufferedWriter bw = Files.newBufferedWriter(Paths.get(getInputModelsResultFilePath()), StandardCharsets.UTF_8);
+                PrintWriter pw = new PrintWriter(bw);
+        ) {
+            pw.println(data.toJson());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void dump() {
