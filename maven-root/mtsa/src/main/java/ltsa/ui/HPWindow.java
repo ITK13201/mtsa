@@ -2080,6 +2080,9 @@ public class HPWindow extends JFrame implements Runnable {
                         );
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
+
+                    // input models result dump
+                    LTSResultManager.dump_input_models();
                 case ONLY_PERFORMANCE:
                 case DISABLED:
                     break;
