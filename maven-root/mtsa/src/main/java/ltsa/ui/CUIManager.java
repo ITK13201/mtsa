@@ -95,6 +95,7 @@ class CUIManager {
                     }
                     break;
                 case FOR_MACHINE_LEARNING:
+                case FOR_MACHINE_LEARNING_EXTRA:
                     LTSResultManager.setControllableActions(cs.goal.getControllableActions());
 
                     // environments
@@ -157,6 +158,7 @@ class CUIManager {
                 break;
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
             case DISABLED:
                 break;
         }
@@ -176,6 +178,7 @@ class CUIManager {
                 break;
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
             case DISABLED:
                 break;
         }
@@ -223,6 +226,7 @@ class CUIManager {
             case ENABLED:
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
                 LTSResultManager.data.setMaxMemoryUsage(HPWindow.maxMemoryUsage);
                 break;
             case DISABLED:
@@ -241,6 +245,7 @@ class CUIManager {
             case ENABLED:
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
                 LTSResultManager.start();
                 doCompile(ltsInput, ltsOutput, currentDirectory, targetName);
                 LTSResultManager.finish();
@@ -261,6 +266,7 @@ class CUIManager {
             case ENABLED:
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
                 LTSResultManager.start();
                 doComposition(ltsInput, ltsOutput, currentDirectory, targetName);
                 LTSResultManager.finish();
@@ -286,6 +292,7 @@ class CUIManager {
             case ENABLED:
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
                 LTSResultManager.init("CUI", this.command, this.inputFilePath, this.targetName);
                 break;
             case DISABLED:

@@ -602,6 +602,7 @@ class ProcessRef {
                 switch (LTSResultManager.mode) {
                     case ENABLED:
                     case FOR_MACHINE_LEARNING:
+                    case FOR_MACHINE_LEARNING_EXTRA:
                         LTSResultInitialModelsEnvironment environment = new LTSResultInitialModelsEnvironment(mach);
                         LTSResultManager.data.getInitialModels().environments.add(environment);
                         break;

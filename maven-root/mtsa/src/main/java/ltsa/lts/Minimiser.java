@@ -148,6 +148,7 @@ public class Minimiser {
                 break;
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:
+            case FOR_MACHINE_LEARNING_EXTRA:
             case DISABLED:
                 break;
         }
