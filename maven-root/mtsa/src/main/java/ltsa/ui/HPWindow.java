@@ -2020,6 +2020,7 @@ public class HPWindow extends JFrame implements Runnable {
             }
 
             cs = comp.continueCompilation((String) targetChoice.getSelectedItem());
+            Boolean isEnabledStructure = false;
 
             switch (LTSResultManager.mode) {
                 case ENABLED:
@@ -2039,7 +2040,7 @@ public class HPWindow extends JFrame implements Runnable {
                     }
 
                     for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                        environment.initialize(cs.goal, ltsOutput);
+                        environment.initialize(cs.goal, ltsOutput, true);
                     }
 
                     for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
@@ -2057,13 +2058,14 @@ public class HPWindow extends JFrame implements Runnable {
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
                     break;
-                case FOR_MACHINE_LEARNING:
                 case FOR_MACHINE_LEARNING_EXTRA:
+                    isEnabledStructure = true;
+                case FOR_MACHINE_LEARNING:
                     LTSResultManager.setControllableActions(cs.goal.getControllableActions());
 
                     // environments
                     for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                        environment.initialize(cs.goal, ltsOutput);
+                        environment.initialize(cs.goal, ltsOutput, isEnabledStructure);
                     }
 
                     // requirements

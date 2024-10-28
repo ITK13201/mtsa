@@ -55,6 +55,7 @@ class CUIManager {
         try {
             comp.compile();
             cs = comp.continueCompilation(targetControllerName);
+            Boolean isEnabledStructure = false;
 
             switch (LTSResultManager.mode) {
                 case ENABLED:
@@ -76,7 +77,7 @@ class CUIManager {
                     }
 
                     for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                        environment.initialize(cs.goal, ltsOutput);
+                        environment.initialize(cs.goal, ltsOutput, true);
                     }
 
                     for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
@@ -94,13 +95,14 @@ class CUIManager {
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
                     break;
-                case FOR_MACHINE_LEARNING:
                 case FOR_MACHINE_LEARNING_EXTRA:
+                    isEnabledStructure = true;
+                case FOR_MACHINE_LEARNING:
                     LTSResultManager.setControllableActions(cs.goal.getControllableActions());
 
                     // environments
                     for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
-                        environment.initialize(cs.goal, ltsOutput);
+                        environment.initialize(cs.goal, ltsOutput, isEnabledStructure);
                     }
 
                     // requirements

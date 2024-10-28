@@ -2,6 +2,8 @@ package ltsa.lts.result;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+
 @Data
 public class LTSResultInitialModelsRequirement {
     private String name;
@@ -9,9 +11,11 @@ public class LTSResultInitialModelsRequirement {
     private Integer numberOfTransitions;
     private Integer numberOfControllableActions;
     private Integer numberOfUncontrollableActions;
+    public ArrayList<ArrayList<Integer>> structure;
 
     public LTSResultInitialModelsRequirement(String name) {
         this.name = name;
+        this.structure = new ArrayList<>();
     }
 
     public LTSResultInitialModelsRequirement(String name, Integer numberOfStates, Integer numberOfTransitions, Integer numberOfControllableActions, Integer numberOfUncontrollableActions) {
@@ -20,5 +24,6 @@ public class LTSResultInitialModelsRequirement {
         this.numberOfTransitions = numberOfTransitions;
         this.numberOfControllableActions = numberOfControllableActions;
         this.numberOfUncontrollableActions = numberOfUncontrollableActions;
+        this.structure = new ArrayList<>();
     }
 }
