@@ -3,7 +3,7 @@ MEMORY_FLAG			= -Xmx20G
 JAR_FLAG			= -jar
 TARGET				= ./target/mtsa.jar
 MTSA_TARGET			= TraditionalController
-MTSA_RESULT_MODE	= for-machine-learning
+MTSA_RESULT_MODE	= for-machine-learning-extra
 
 clean:
 	mvn clean
