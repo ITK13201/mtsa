@@ -120,6 +120,9 @@ class CUIManager {
                         requirement.setNumberOfUncontrollableActions(
                                 numberOfTransitions - Math.toIntExact(numberOfControllableActions)
                         );
+                        if (isEnabledStructure) {
+                            requirement.setStructure(mts, cs.goal);
+                        }
                         LTSResultManager.data.getInitialModels().requirements.add(requirement);
                     }
 
