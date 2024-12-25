@@ -168,7 +168,10 @@ class CUIManager {
                 break;
         }
 
+        LTSResultManager.startCompile();
         CompositeState cs = this.doCompile(ltsInputString, ltsOutput, currentDirectory, targetName);
+        LTSResultManager.finishCompile();
+
         ltsOutput.outln("Compile is Complete!");
         ltsOutput.outln("");
         ltsOutput.outln("");
@@ -188,7 +191,9 @@ class CUIManager {
                 break;
         }
 
+        LTSResultManager.startCreatingGameSpace();
         TransitionSystemDispatcher.applyComposition(cs, ltsOutput);
+        LTSResultManager.finishSolvingProblem();
 
         long endTime = System.currentTimeMillis();
         long executionTime = endTime - startTime; //ms

@@ -2271,7 +2271,10 @@ public class HPWindow extends JFrame implements Runnable {
                 break;
         }
 
+            LTSResultManager.startCompile();
             compile();
+            LTSResultManager.finishCompile();
+
             ltsOutput.outln("Compile is Complete!");
             ltsOutput.outln("");
             ltsOutput.outln("");
@@ -2291,7 +2294,10 @@ public class HPWindow extends JFrame implements Runnable {
                 break;
         }
 
+            LTSResultManager.startCreatingGameSpace();
             TransitionSystemDispatcher.applyComposition(current, ltsOutput);
+            LTSResultManager.finishSolvingProblem();
+
             postState(current);
 
             int[] current_states = new int[current.machines.size() + 1];

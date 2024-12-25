@@ -45,6 +45,39 @@ public class LTSResultManager {
         data.calculateDuration();
     }
 
+    public static void startCompile() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getCompileStep().setStartedAt(now);
+    }
+
+    public static void finishCompile() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getCompileStep().setFinishedAt(now);
+        data.getCompileStep().calculateDuration();
+    }
+
+    public static void startCreatingGameSpace() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getComposeStep().creatingGameSpace.setStartedAt(now);
+    }
+
+    public static void finishCreatingGameSpace() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getComposeStep().creatingGameSpace.setFinishedAt(now);
+        data.getComposeStep().creatingGameSpace.calculateDuration();
+    }
+
+    public static void startSolvingProblem() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getComposeStep().solvingProblem.setStartedAt(now);
+    }
+
+    public static void finishSolvingProblem() {
+        ZonedDateTime now = ZonedDateTime.now(JST);
+        data.getComposeStep().solvingProblem.setFinishedAt(now);
+        data.getComposeStep().solvingProblem.calculateDuration();
+    }
+
     private static String getResultFilePath() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
         String prefix = formatter.format(data.getStartedAt());

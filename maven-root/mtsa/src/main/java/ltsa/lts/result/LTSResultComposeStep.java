@@ -1,7 +1,9 @@
 package ltsa.lts.result;
 
 public class LTSResultComposeStep {
+    // [Modified Parallel Composition, Error State Abstraction]
     public LTSResultComposeStepCreatingGameSpace creatingGameSpace;
+    // [Safety Game Solving]
     public LTSResultComposeStepSolvingProblem solvingProblem;
 
     LTSResultComposeStep() {

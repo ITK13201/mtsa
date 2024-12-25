@@ -25,7 +25,9 @@ public class LTSResult {
 
     // additional parameters
     private LTSResultInitialModels initialModels;
+    // [Parallel Composition]
     private LTSResultCompileStep compileStep;
+    // [Modified Parallel Composition, Error State Abstraction, Safety Game Solving]
     private LTSResultComposeStep composeStep;
 
     private ZonedDateTime startedAt;

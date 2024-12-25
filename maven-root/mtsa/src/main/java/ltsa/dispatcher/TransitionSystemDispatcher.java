@@ -2033,7 +2033,9 @@ public class TransitionSystemDispatcher {
         } else if (!isMTS) {
             // ToMarian: add this (most of it?) code to a new class
             // LTSControlProblem
+            LTSResultManager.finishCreatingGameSpace();
             output.outln("Solving the LTS control problem.");
+            LTSResultManager.startSolvingProblem();
 
             switch (LTSResultManager.mode) {
                 case ENABLED:
