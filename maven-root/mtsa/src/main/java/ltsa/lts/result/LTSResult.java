@@ -34,7 +34,7 @@ public class LTSResult {
     private ZonedDateTime finishedAt;
     @SerializedName("duration [ms]")
     private Duration duration;
-    @SerializedName("maxMemoryUsage [KB]")
+    @SerializedName("maxMemoryUsage [KiB]")
     private Long maxMemoryUsage;
 
     public LTSResult(String mode, String command, String ltsFilePath, String target) {
