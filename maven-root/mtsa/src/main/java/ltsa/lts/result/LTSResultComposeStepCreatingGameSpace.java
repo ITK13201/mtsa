@@ -23,7 +23,7 @@ public class LTSResultComposeStepCreatingGameSpace {
     @SerializedName("duration [ms]")
     private Duration duration;
     @SerializedName("maxMemoryUsage [KB]")
-    private Long maxMemoryUsage;
+    private Long maxMemoryUsage = -1L;
 
     public LTSResultComposeStepCreatingGameSpace() {
         this.sourceModels = new ArrayList<>();

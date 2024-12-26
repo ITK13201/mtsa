@@ -255,7 +255,6 @@ public class Analyser implements Animator, Automata {
                             }
                             LTSResultManager.data.getCompileStep().environments.add(environmentResult);
                             break;
-                        case COMPOSE:
                         case COMPOSE_CREATING_GAME_SPACE:
                             LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
                                     getComposeStep().
@@ -338,7 +337,6 @@ public class Analyser implements Animator, Automata {
                             environmentResult.setNumberOfTransitions(compTrans.size());
                             environmentResult.setComposeDuration(Duration.ofMillis(finish - start));
                             break;
-                        case COMPOSE:
                         case COMPOSE_CREATING_GAME_SPACE:
                             LTSResultComposeStepCreatingGameSpace creatingGameSpaceResult = LTSResultManager.data.
                                     getComposeStep().
@@ -644,11 +642,24 @@ public class Analyser implements Animator, Automata {
 
     private void outStatistics(int states, int transitions) {
         Runtime r = Runtime.getRuntime();
+        long memory = (r.totalMemory() - r.freeMemory()) / 1000;
         output.outln("-- States: " + states + " Transitions: " + transitions
-                + " Memory used: " + (r.totalMemory() - r.freeMemory()) / 1000
+                + " Memory used: " +  memory
                 + "KB");
         HPWindow.checkMemoryUsage();
         HPWindow.checkSpace(states,transitions);
+
+        switch (LTSResultManager.currentStep) {
+            case COMPILE:
+                LTSResultManager.updateCompileMaxMemoryUsage(memory);
+                break;
+            case COMPOSE_CREATING_GAME_SPACE:
+                LTSResultManager.updateCreatingGameSpaceMaxMemoryUsage(memory);
+                break;
+            case COMPOSE_SOLVING_PROBLEM:
+                LTSResultManager.updateSolvingProblemMaxMemoryUsage(memory);
+                break;
+        }
     }
 
     private int endSequence = LTSConstants.NO_SEQUENCE_FOUND;

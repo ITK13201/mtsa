@@ -182,7 +182,7 @@ class CUIManager {
 
         switch (LTSResultManager.mode) {
             case ENABLED:
-                LTSResultManager.currentStep = LTSResultStep.COMPOSE;
+                LTSResultManager.currentStep = LTSResultStep.COMPOSE_CREATING_GAME_SPACE;
                 break;
             case ONLY_PERFORMANCE:
             case FOR_MACHINE_LEARNING:

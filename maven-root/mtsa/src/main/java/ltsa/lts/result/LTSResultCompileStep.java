@@ -18,7 +18,7 @@ public class LTSResultCompileStep {
     @SerializedName("duration [ms]")
     private Duration duration;
     @SerializedName("maxMemoryUsage [KB]")
-    private Long maxMemoryUsage;
+    private Long maxMemoryUsage = -1L;
 
     LTSResultCompileStep() {
         this.environments = new ArrayList<>();

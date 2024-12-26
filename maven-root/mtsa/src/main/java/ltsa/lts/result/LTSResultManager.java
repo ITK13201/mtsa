@@ -56,6 +56,13 @@ public class LTSResultManager {
         data.getCompileStep().calculateDuration();
     }
 
+    public static void updateCompileMaxMemoryUsage(Long value) {
+        Long max = data.getCompileStep().getMaxMemoryUsage();
+        if (value > max) {
+            data.getCompileStep().setMaxMemoryUsage(value);
+        }
+    }
+
     public static void startCreatingGameSpace() {
         ZonedDateTime now = ZonedDateTime.now(JST);
         data.getComposeStep().creatingGameSpace.setStartedAt(now);
@@ -67,6 +74,13 @@ public class LTSResultManager {
         data.getComposeStep().creatingGameSpace.calculateDuration();
     }
 
+    public static void updateCreatingGameSpaceMaxMemoryUsage(Long value) {
+        Long max = data.getComposeStep().creatingGameSpace.getMaxMemoryUsage();
+        if (value > max) {
+            data.getComposeStep().creatingGameSpace.setMaxMemoryUsage(value);
+        }
+    }
+
     public static void startSolvingProblem() {
         ZonedDateTime now = ZonedDateTime.now(JST);
         data.getComposeStep().solvingProblem.setStartedAt(now);
@@ -76,6 +90,13 @@ public class LTSResultManager {
         ZonedDateTime now = ZonedDateTime.now(JST);
         data.getComposeStep().solvingProblem.setFinishedAt(now);
         data.getComposeStep().solvingProblem.calculateDuration();
+    }
+
+    public static void updateSolvingProblemMaxMemoryUsage(Long value) {
+        Long max = data.getComposeStep().solvingProblem.getMaxMemoryUsage();
+        if (value > max) {
+            data.getComposeStep().solvingProblem.setMaxMemoryUsage(value);
+        }
     }
 
     private static String getResultFilePath() {

@@ -25,7 +25,7 @@ public class LTSResultComposeStepSolvingProblem {
     @SerializedName("duration [ms]")
     private Duration duration;
     @SerializedName("maxMemoryUsage [KB]")
-    private Long maxMemoryUsage;
+    private Long maxMemoryUsage = -1L;
 
     public LTSResultComposeStepSolvingProblem() {
         this.sourceModels = new ArrayList<>();
