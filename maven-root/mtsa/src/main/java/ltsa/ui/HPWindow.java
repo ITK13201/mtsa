@@ -2025,37 +2025,41 @@ public class HPWindow extends JFrame implements Runnable {
             switch (LTSResultManager.mode) {
                 case ENABLED:
                     LTSResultManager.setControllableActions(cs.goal.getControllableActions());
-                    for (CompactState machine : cs.machines) {
-                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
-                        LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
-                        finalModel.setNumberOfStates(mts.getStates().size());
-                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
-                        finalModel.setNumberOfTransitions(numberOfTransitions);
-                        Long numberOfControllableActions = ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput);
-                        finalModel.setNumberOfControllableActions(Math.toIntExact(numberOfControllableActions));
-                        finalModel.setNumberOfUncontrollableActions(
-                                numberOfTransitions - Math.toIntExact(numberOfControllableActions)
-                        );
-                        LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
-                    }
 
+                    // environments
                     for (LTSResultInitialModelsEnvironment environment : LTSResultManager.data.getInitialModels().environments) {
                         environment.initialize(cs.goal, ltsOutput, true);
                     }
 
-                    for (LTSResultCompileStepFinalModel finalModel : LTSResultManager.data.getCompileStep().finalModels) {
-                        if (finalModel == LTSResultManager.data.getCompileStep().finalModels.get(0)) {
-                            continue;
-                        }
+                    // requirements
+                    for (CompactState machine : cs.machines) {
+                        MTS<Long, String> mts = AutomataToMTSConverter.getInstance().convert(machine);
 
-                        LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
-                                finalModel.getName(),
-                                finalModel.getNumberOfStates(),
-                                finalModel.getNumberOfTransitions(),
-                                finalModel.getNumberOfControllableActions(),
-                                finalModel.getNumberOfUncontrollableActions()
-                        );
-                        LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                        int numberOfStates = mts.getStates().size();
+                        int numberOfTransitions = Math.toIntExact(ControllerUtils.getNumberOfTransitions(mts));
+                        int numberOfControllableActions = Math.toIntExact(ControllerUtils.getNumberOfControllableActions(mts, cs.goal, ltsOutput));
+                        int numberOfUncontrollableActions = numberOfTransitions - Math.toIntExact(numberOfControllableActions);
+
+                        // final models
+                        LTSResultCompileStepFinalModel finalModel = new LTSResultCompileStepFinalModel(machine.name);
+                        finalModel.setNumberOfStates(numberOfStates);
+                        finalModel.setNumberOfTransitions(numberOfTransitions);
+                        finalModel.setNumberOfControllableActions(numberOfControllableActions);
+                        finalModel.setNumberOfUncontrollableActions(numberOfUncontrollableActions);
+                        LTSResultManager.data.getCompileStep().finalModels.add(finalModel);
+
+                        // initial models (requirement)
+                        if (!machine.name.equals("Environment")) {
+                            LTSResultInitialModelsRequirement requirement = new LTSResultInitialModelsRequirement(
+                                    machine.name,
+                                    numberOfStates,
+                                    numberOfTransitions,
+                                    numberOfControllableActions,
+                                    numberOfUncontrollableActions
+                            );
+                            requirement.setStructure(mts, cs.goal);
+                            LTSResultManager.data.getInitialModels().requirements.add(requirement);
+                        }
                     }
                     break;
                 case FOR_MACHINE_LEARNING_EXTRA:
